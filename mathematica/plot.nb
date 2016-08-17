@@ -1,0 +1,208 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      7392,        200]
+NotebookOptionsPosition[      7072,        184]
+NotebookOutlinePosition[      7428,        200]
+CellTagsIndexPosition[      7385,        197]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"Get", "[", 
+   RowBox[{"FileNameJoin", "[", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"NotebookDirectory", "[", "]"}], ",", "\"\<distDef.m\>\""}], 
+     "}"}], "]"}], "]"}], ";"}]], "Input",
+ InitializationCell->True,
+ CellChangeTimes->{{3.68000313700931*^9, 3.680003137258366*^9}, {
+   3.680003511728655*^9, 3.680003514202175*^9}, {3.680003692373537*^9, 
+   3.6800037134148893`*^9}, {3.6800037484536123`*^9, 
+   3.6800037900328417`*^9}, {3.680003860652109*^9, 3.680004090050146*^9}, {
+   3.68000417029747*^9, 3.680004172360538*^9}, {3.680004228315053*^9, 
+   3.68000424389613*^9}, {3.68000433461893*^9, 3.680004349815486*^9}, {
+   3.680004381958138*^9, 3.680004401802071*^9}, {3.680004771155901*^9, 
+   3.6800048577686043`*^9}, {3.68007268122519*^9, 3.680072741595599*^9}, {
+   3.680072797715762*^9, 3.6800728085583572`*^9}, 3.6800729123973*^9, {
+   3.680114654740238*^9, 3.680114664379278*^9}},
+ FontSize->18],
+
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"max", " ", ":=", " ", "10000"}], ";"}], "\n", "\n", 
+   RowBox[{
+    RowBox[{"plotP2", "[", 
+     RowBox[{"t_", ",", " ", "a_", ",", " ", "c_"}], "]"}], " ", ":=", " ", 
+    RowBox[{"DiscretePlot", "[", 
+     RowBox[{
+      RowBox[{"mdf2", "[", 
+       RowBox[{"t", ",", " ", "a", ",", " ", "c", ",", " ", "r"}], "]"}], ",",
+       " ", 
+      RowBox[{"{", 
+       RowBox[{"r", ",", " ", 
+        RowBox[{"Max", "[", 
+         RowBox[{
+          RowBox[{"a", " ", "+", " ", "c", " ", "-", " ", "t"}], ",", " ", 
+          "0"}], "]"}], ",", " ", 
+        RowBox[{"Min", "[", 
+         RowBox[{"a", ",", " ", "c"}], "]"}]}], "}"}], ",", " ", 
+      RowBox[{"PlotRange", " ", "->", " ", "All"}], ",", " ", 
+      RowBox[{"AxesLabel", " ", "->", " ", 
+       RowBox[{"{", 
+        RowBox[{"\"\<No. of results\>\"", ",", " ", "\"\<Probability\>\""}], 
+        "}"}]}]}], "]"}]}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"plotP4", "[", 
+     RowBox[{"t_", ",", "a_", ",", "b_", ",", "c_", ",", "d_", ",", "r_"}], 
+     "]"}], ":=", 
+    RowBox[{"DiscretePlot", "[", 
+     RowBox[{
+      RowBox[{"mdf", "[", 
+       RowBox[{"t", ",", 
+        RowBox[{"{", " ", 
+         RowBox[{"a", ",", "b", ",", " ", "c"}], "}"}], ",", " ", "r"}], 
+       "]"}], ",", 
+      RowBox[{"{", 
+       RowBox[{"r", ",", " ", 
+        RowBox[{"Max", "[", 
+         RowBox[{
+          RowBox[{
+          "a", " ", "+", "b", "+", " ", "c", " ", "+", "d", "-", " ", 
+           RowBox[{"2", "*", "t"}]}], ",", " ", "0"}], "]"}], ",", " ", 
+        RowBox[{"Min", "[", 
+         RowBox[{"a", ",", "b", ",", "c", ",", "d"}], "]"}]}], "}"}], ",", 
+      " ", 
+      RowBox[{"PlotRange", " ", "->", " ", "All"}], ",", " ", 
+      RowBox[{"AxesLabel", " ", "->", " ", 
+       RowBox[{"{", 
+        RowBox[{"\"\<No. of results\>\"", ",", " ", "\"\<Probability\>\""}], 
+        "}"}]}]}], "]"}]}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"plotM2", "[", "t_", "]"}], " ", ":=", " ", 
+    RowBox[{"DiscretePlot3D", "[", 
+     RowBox[{
+      RowBox[{"Mean", "[", 
+       RowBox[{"dist2", "[", 
+        RowBox[{"t", ",", " ", "a", ",", " ", "c"}], "]"}], "]"}], ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"a", ",", " ", "0", ",", " ", "t", ",", " ", "1"}], "}"}], ",",
+       " ", 
+      RowBox[{"{", 
+       RowBox[{"c", ",", " ", "0", ",", " ", "t", ",", " ", "1"}], "}"}], ",",
+       " ", 
+      RowBox[{"PlotRange", " ", "->", " ", "All"}], ",", " ", 
+      RowBox[{"AxesLabel", " ", "->", " ", 
+       RowBox[{"{", 
+        RowBox[{
+        "\"\<Left card. (a)\>\"", ",", " ", "\"\<Right card. (c)\>\"", ",", 
+         " ", "\"\<Result mean\>\""}], "}"}]}]}], "]"}]}], 
+   "\[IndentingNewLine]", "\n", 
+   RowBox[{"Manipulate", "[", 
+    RowBox[{
+     RowBox[{"plotP2", "[", 
+      RowBox[{"t", ",", " ", "a", ",", " ", "c"}], "]"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"t", ",", " ", "100"}], "}"}], ",", " ", "0", ",", " ", "max",
+        ",", " ", "1"}], "}"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"a", ",", " ", "23"}], "}"}], ",", " ", "0", ",", " ", "t", 
+       ",", " ", "1"}], "}"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"c", ",", " ", "29"}], "}"}], ",", " ", "0", ",", " ", "t", 
+       ",", " ", "1"}], "}"}]}], "]"}], "\[IndentingNewLine]", "\n", 
+   RowBox[{"Manipulate", "[", 
+    RowBox[{
+     RowBox[{"plotP4", "[", 
+      RowBox[{"t", ",", "a", ",", "b", ",", "c", ",", "d", ",", "r"}], "]"}], 
+     ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"t", ",", " ", "100"}], "}"}], ",", " ", "0", ",", " ", "max",
+        ",", " ", "1"}], "}"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"a", ",", " ", "23"}], "}"}], ",", " ", "0", ",", " ", "t", 
+       ",", " ", "1"}], "}"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"b", ",", " ", "29"}], "}"}], ",", " ", "0", ",", " ", "t", 
+       ",", " ", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"c", ",", " ", "41"}], "}"}], ",", " ", "0", ",", " ", "t", 
+       ",", " ", "1"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"d", ",", " ", "41"}], "}"}], ",", " ", "0", ",", " ", "t", 
+       ",", " ", "1"}], "}"}]}], "]"}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   RowBox[{"Manipulate", "[", 
+    RowBox[{
+     RowBox[{"plotM2", "[", "t", "]"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"t", ",", " ", "30"}], "}"}], ",", " ", "0", ",", " ", 
+       RowBox[{"max", "/", "100"}], ",", " ", "1"}], "}"}]}], 
+    "]"}]}]}]], "Input",
+ CellChangeTimes->{{3.68000313700931*^9, 3.680003137258366*^9}, {
+   3.680003511728655*^9, 3.680003514202175*^9}, {3.680003692373537*^9, 
+   3.6800037134148893`*^9}, {3.6800037484536123`*^9, 
+   3.6800037900328417`*^9}, {3.680003860652109*^9, 3.680004090050146*^9}, {
+   3.68000417029747*^9, 3.680004172360538*^9}, {3.680004228315053*^9, 
+   3.68000424389613*^9}, {3.68000433461893*^9, 3.680004349815486*^9}, {
+   3.680004381958138*^9, 3.680004401802071*^9}, {3.680004771155901*^9, 
+   3.6800048577686043`*^9}, {3.68007268122519*^9, 3.680072741595599*^9}, {
+   3.680072797715762*^9, 3.6800728085583572`*^9}, 3.6800729123973*^9, {
+   3.680114654740238*^9, 3.680114664379278*^9}},
+ FontSize->18]
+},
+WindowSize->{913, 911},
+WindowMargins->{{Automatic, 143}, {Automatic, 169}},
+FrontEndVersion->"11.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (July 28, \
+2016)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 951, 19, 55, "Input",
+ InitializationCell->True],
+Cell[1512, 41, 5556, 141, 707, "Input"]
+}
+]
+*)
+

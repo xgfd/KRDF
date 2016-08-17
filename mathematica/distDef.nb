@@ -1,0 +1,272 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 11.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     10246,        264]
+NotebookOptionsPosition[      9889,        246]
+NotebookOutlinePosition[     10319,        265]
+CellTagsIndexPosition[     10276,        262]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"t", ":", 
+     RowBox[{"total", " ", "number", " ", "of", " ", "rows"}]}], ";", 
+    "\[IndentingNewLine]", 
+    RowBox[{"a", ":", 
+     RowBox[{"sum", " ", "of", " ", "the", " ", "first", " ", "column"}]}], 
+    ";", "\[IndentingNewLine]", 
+    RowBox[{"b", ":", 
+     RowBox[{"sum", " ", "of", " ", "the", " ", "second", " ", "column"}]}], 
+    ";", "\[IndentingNewLine]", 
+    RowBox[{"r", ":", 
+     RowBox[{
+     "number", " ", "of", " ", "rows", " ", "that", " ", "consist", " ", "of",
+       " ", "only", " ", 
+      RowBox[{"1", "'"}], "s"}]}]}], "\[IndentingNewLine]", "*)"}], 
+  "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"mdf2", "[", 
+     RowBox[{"t_", ",", " ", "a_", ",", " ", "b_", ",", " ", "r_"}], "]"}], 
+    " ", ":=", " ", 
+    RowBox[{
+     RowBox[{"Binomial", "[", 
+      RowBox[{"a", ",", " ", "r"}], "]"}], "*", 
+     RowBox[{
+      RowBox[{"Binomial", "[", 
+       RowBox[{
+        RowBox[{"t", " ", "-", " ", "a"}], ",", " ", 
+        RowBox[{"b", " ", "-", " ", "r"}]}], "]"}], "/", 
+      RowBox[{"Binomial", "[", 
+       RowBox[{"t", ",", " ", "b"}], "]"}]}]}]}], "\[IndentingNewLine]", "\n", 
+   RowBox[{
+    RowBox[{"mdf2", "[", 
+     RowBox[{"t_", ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"a_", ",", " ", "b_"}], "}"}], ",", " ", "r_"}], "]"}], " ", ":=",
+     " ", 
+    RowBox[{"mdf2", "[", 
+     RowBox[{"t", ",", " ", "a", ",", " ", "b", ",", " ", "r"}], "]"}]}], 
+   "\[IndentingNewLine]", "\[IndentingNewLine]", 
+   RowBox[{"(*", "\[IndentingNewLine]", 
+    RowBox[{"for", " ", "three", " ", "columns"}], "\[IndentingNewLine]", 
+    "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"mdf3l", "[", 
+     RowBox[{"t_", ",", "a_", ",", "b_", ",", "c_", ",", "r_"}], "]"}], ":=", 
+    " ", 
+    RowBox[{"Sum", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"mdf2", "[", 
+        RowBox[{"t", ",", " ", "a", ",", " ", "b", ",", " ", "r1"}], "]"}], 
+       "*", 
+       RowBox[{"mdf2", "[", 
+        RowBox[{"t", ",", " ", "r1", ",", " ", "c", ",", " ", "r"}], "]"}]}], 
+      ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"r1", ",", 
+        RowBox[{"Max", "[", 
+         RowBox[{
+          RowBox[{"a", "+", "b", "-", "t"}], ",", "0"}], "]"}], ",", 
+        RowBox[{"Min", "[", 
+         RowBox[{"a", ",", "b"}], "]"}], ",", "1"}], "}"}]}], "]"}]}], 
+   "\[IndentingNewLine]", "\n", 
+   RowBox[{
+    RowBox[{"mdf3r", "[", 
+     RowBox[{
+     "t_", ",", " ", "a_", ",", " ", "b_", ",", " ", "c_", ",", " ", "r_"}], 
+     "]"}], " ", ":=", " ", 
+    RowBox[{"Sum", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"mdf2", "[", 
+        RowBox[{"t", ",", " ", "b", ",", " ", "c", ",", " ", "r1"}], "]"}], 
+       "*", 
+       RowBox[{"mdf2", "[", 
+        RowBox[{"t", ",", " ", "a", ",", " ", "r1", ",", " ", "r"}], "]"}]}], 
+      ",", " ", 
+      RowBox[{"{", 
+       RowBox[{"r1", ",", " ", 
+        RowBox[{"Max", "[", 
+         RowBox[{
+          RowBox[{"c", " ", "+", " ", "b", " ", "-", " ", "t"}], ",", " ", 
+          "0"}], "]"}], ",", " ", 
+        RowBox[{"Min", "[", 
+         RowBox[{"b", ",", " ", "c"}], "]"}], ",", " ", "1"}], "}"}]}], 
+     "]"}]}], "\[IndentingNewLine]", "\n", 
+   RowBox[{"(*", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"for", " ", "n", " ", "columns"}], ";", "\[IndentingNewLine]", 
+     RowBox[{"c", ":", 
+      RowBox[{
+      "a", " ", "list", " ", "of", " ", "length", " ", "n", " ", "that", " ", 
+       "consist", " ", "of", " ", "the", " ", "sum", " ", "of", " ", "each", 
+       " ", "column"}]}]}], "\n", "*)"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"bottom", "[", 
+     RowBox[{"c_", ",", " ", "t_"}], "]"}], " ", ":=", " ", 
+    RowBox[{"With", "[", "\n", "  ", 
+     RowBox[{
+      RowBox[{"{", 
+       RowBox[{"n", " ", "=", " ", 
+        RowBox[{"Length", "[", "c", "]"}]}], "}"}], ",", "\n", "  ", 
+      RowBox[{"Max", "[", 
+       RowBox[{
+        RowBox[{
+         RowBox[{"Plus", " ", "@@", " ", "c"}], " ", "-", " ", 
+         RowBox[{"t", "*", 
+          RowBox[{"(", 
+           RowBox[{"n", " ", "-", " ", "1"}], ")"}]}]}], ",", " ", "0"}], 
+       "]"}]}], "]"}]}], "\[IndentingNewLine]", "\n", 
+   RowBox[{
+    RowBox[{"top", "[", "c_", "]"}], " ", ":=", " ", 
+    RowBox[{"Min", "[", "c", "]"}]}], "\n", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"mdf", "[", 
+     RowBox[{"t_", ",", "c_", ",", "r_"}], "]"}], " ", ":=", 
+    RowBox[{
+     RowBox[{"(", 
+      RowBox[{"(*", 
+       RowBox[{
+        RowBox[{"Print", "[", 
+         RowBox[{"\"\<mdf2: \>\"", ",", "c", ",", "\"\<r: \>\"", ",", "r"}], 
+         "]"}], ";"}], "*)"}], 
+      RowBox[{"mdf2", "[", 
+       RowBox[{"t", ",", "c", ",", "r"}], "]"}], ")"}], "/;", " ", 
+     RowBox[{
+      RowBox[{"Length", "[", "c", "]"}], " ", "==", " ", "2"}]}]}], 
+   "\[IndentingNewLine]", "\n", 
+   RowBox[{
+    RowBox[{"mdf", "[", 
+     RowBox[{"t_", ",", "c_", ",", "r_"}], "]"}], ":=", 
+    RowBox[{
+     RowBox[{"With", "[", "\n", "   ", 
+      RowBox[{
+       RowBox[{"{", "\n", "    ", 
+        RowBox[{
+         RowBox[{"c1", " ", "=", " ", 
+          RowBox[{"Take", "[", 
+           RowBox[{"c", ",", " ", 
+            RowBox[{
+             RowBox[{"Length", "[", "c", "]"}], " ", "-", " ", "1"}]}], 
+           "]"}]}], ",", 
+         RowBox[{"tail", "=", 
+          RowBox[{"Last", "[", "c", "]"}]}]}], "\n", "    ", "}"}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"(*", 
+        RowBox[{
+         RowBox[{"Print", "[", 
+          RowBox[{"\"\<mdf c: \>\"", ",", "c"}], "]"}], ";", 
+         "\[IndentingNewLine]", 
+         RowBox[{"Print", "[", 
+          RowBox[{"\"\<bottom\>\"", ",", 
+           RowBox[{"bottom", "[", 
+            RowBox[{"c1", ",", "t"}], "]"}], ",", "\"\<top\>\"", ",", 
+           RowBox[{"top", "[", "c1", "]"}]}], "]"}], ";"}], "*)"}], "\n", 
+       "   ", 
+       RowBox[{"Sum", "[", 
+        RowBox[{
+         RowBox[{
+          RowBox[{"mdf", "[", 
+           RowBox[{"t", ",", "c1", ",", "r1"}], "]"}], "*", 
+          RowBox[{"mdf2", "[", 
+           RowBox[{"t", ",", "r1", ",", "tail", ",", "r"}], "]"}]}], ",", " ", 
+         RowBox[{"{", 
+          RowBox[{"r1", ",", 
+           RowBox[{"bottom", "[", 
+            RowBox[{"c1", ",", "t"}], "]"}], ",", 
+           RowBox[{"top", "[", "c1", "]"}], ",", "1"}], "}"}]}], "]"}]}], 
+      "]"}], "/;", " ", 
+     RowBox[{
+      RowBox[{"Length", "[", "c", "]"}], "\[GreaterEqual]", "3"}]}]}], "\n", 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"dist2", "[", 
+      RowBox[{"t_", ",", " ", "a_", ",", " ", "c_"}], "]"}], " ", ":=", " ", 
+     RowBox[{"ProbabilityDistribution", "[", 
+      RowBox[{
+       RowBox[{"mdf2", "[", 
+        RowBox[{"t", ",", " ", "a", ",", " ", "c", ",", " ", "r"}], "]"}], 
+       ",", " ", 
+       RowBox[{"{", 
+        RowBox[{"r", ",", " ", 
+         RowBox[{"Max", "[", 
+          RowBox[{
+           RowBox[{"a", " ", "+", " ", "c", " ", "-", " ", "t"}], ",", " ", 
+           "0"}], "]"}], ",", " ", 
+         RowBox[{"Min", "[", 
+          RowBox[{"a", ",", " ", "c"}], "]"}], ",", " ", "1"}], "}"}]}], 
+      "]"}]}], ";"}]}]}]], "Input",
+ PageWidth->WindowWidth,
+ InitializationCell->True,
+ CellChangeTimes->{{3.677395507930366*^9, 3.6773955895549498`*^9}, {
+   3.679913939659504*^9, 3.679914019736741*^9}, {3.679914050764592*^9, 
+   3.679914053340394*^9}, {3.679999494245679*^9, 3.679999495722151*^9}, {
+   3.679999554751747*^9, 3.6799995971868477`*^9}, {3.6799996479585333`*^9, 
+   3.679999704445323*^9}, {3.679999736328842*^9, 3.6799998718580103`*^9}, {
+   3.679999986002552*^9, 3.6800000789273367`*^9}, 3.680000235506957*^9, {
+   3.6800002759645777`*^9, 3.680000363479104*^9}, {3.680000396993566*^9, 
+   3.680000405701436*^9}, {3.680000457148134*^9, 3.6800006749043283`*^9}, {
+   3.680000712536509*^9, 3.6800007160356007`*^9}, 3.680000920433675*^9, {
+   3.680000959155488*^9, 3.6800009591564007`*^9}, {3.6800014042381697`*^9, 
+   3.6800014186929483`*^9}, {3.680001555856422*^9, 3.680001604893523*^9}, {
+   3.680003133030692*^9, 3.680003459954711*^9}, {3.6800865000234528`*^9, 
+   3.680086500235156*^9}, {3.680087312263179*^9, 3.680087340366377*^9}, {
+   3.68008738136417*^9, 3.680087389316864*^9}, {3.680087463605406*^9, 
+   3.6800874647973433`*^9}, {3.680087514685178*^9, 3.68008752035515*^9}, {
+   3.680087670452345*^9, 3.68008768974*^9}, {3.680088220375286*^9, 
+   3.680088223219817*^9}, {3.680088326922049*^9, 3.680088328011297*^9}, {
+   3.6800890908707848`*^9, 3.68008909610886*^9}, 3.680089771528479*^9, {
+   3.680089933934002*^9, 3.680089935591813*^9}, {3.680090275495681*^9, 
+   3.68009027604423*^9}, {3.680113003609428*^9, 3.680113017678742*^9}, {
+   3.680113598104067*^9, 3.680113678866929*^9}, {3.680114300309976*^9, 
+   3.680114303278513*^9}, 3.68011454114846*^9, {3.6801150371567802`*^9, 
+   3.680115064491539*^9}, {3.6801152088863697`*^9, 3.680115230058593*^9}, {
+   3.68011527037289*^9, 3.680115314520815*^9}, {3.680115444505899*^9, 
+   3.6801154575095587`*^9}, 3.6801156103978024`*^9, {3.680115672622449*^9, 
+   3.6801157055831747`*^9}, {3.680115834907401*^9, 3.680115840419732*^9}, 
+   3.680115919719838*^9, {3.680115961483313*^9, 3.680116023051593*^9}, {
+   3.680116078483865*^9, 3.680116092332551*^9}, {3.680116126016137*^9, 
+   3.680116162382844*^9}}]
+},
+AutoGeneratedPackage->Automatic,
+WindowSize->{640, 751},
+WindowMargins->{{Automatic, 0}, {Automatic, 0}},
+Visible->True,
+Magnification:>1.5 Inherited,
+FrontEndVersion->"10.0 for Mac OS X x86 (32-bit, 64-bit Kernel) (June 27, \
+2014)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 9327, 224, 1469, "Input",
+ InitializationCell->True]
+}
+]
+*)
+
