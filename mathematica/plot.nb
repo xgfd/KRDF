@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[      7392,        200]
-NotebookOptionsPosition[      7072,        184]
-NotebookOutlinePosition[      7428,        200]
-CellTagsIndexPosition[      7385,        197]
+NotebookDataLength[      8982,        236]
+NotebookOptionsPosition[      8622,        219]
+NotebookOutlinePosition[      8978,        235]
+CellTagsIndexPosition[      8935,        232]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -64,7 +64,7 @@ Cell[BoxData[
       RowBox[{"AxesLabel", " ", "->", " ", 
        RowBox[{"{", 
         RowBox[{"\"\<No. of results\>\"", ",", " ", "\"\<Probability\>\""}], 
-        "}"}]}]}], "]"}]}], "\n", "\[IndentingNewLine]", 
+        "}"}]}]}], "]"}]}], "\[IndentingNewLine]", "\n", 
    RowBox[{
     RowBox[{"plotP4", "[", 
      RowBox[{"t_", ",", "a_", ",", "b_", ",", "c_", ",", "d_", ",", "r_"}], 
@@ -90,7 +90,7 @@ Cell[BoxData[
       RowBox[{"AxesLabel", " ", "->", " ", 
        RowBox[{"{", 
         RowBox[{"\"\<No. of results\>\"", ",", " ", "\"\<Probability\>\""}], 
-        "}"}]}]}], "]"}]}], "\n", "\[IndentingNewLine]", 
+        "}"}]}]}], "]"}]}], "\[IndentingNewLine]", "\n", 
    RowBox[{
     RowBox[{"plotM2", "[", "t_", "]"}], " ", ":=", " ", 
     RowBox[{"DiscretePlot3D", "[", 
@@ -109,8 +109,8 @@ Cell[BoxData[
        RowBox[{"{", 
         RowBox[{
         "\"\<Left card. (a)\>\"", ",", " ", "\"\<Right card. (c)\>\"", ",", 
-         " ", "\"\<Result mean\>\""}], "}"}]}]}], "]"}]}], 
-   "\[IndentingNewLine]", "\n", 
+         " ", "\"\<Result mean\>\""}], "}"}]}]}], "]"}]}], "\n", 
+   "\[IndentingNewLine]", 
    RowBox[{"Manipulate", "[", 
     RowBox[{
      RowBox[{"plotP2", "[", 
@@ -129,7 +129,7 @@ Cell[BoxData[
       RowBox[{
        RowBox[{"{", 
         RowBox[{"c", ",", " ", "29"}], "}"}], ",", " ", "0", ",", " ", "t", 
-       ",", " ", "1"}], "}"}]}], "]"}], "\[IndentingNewLine]", "\n", 
+       ",", " ", "1"}], "}"}]}], "]"}], "\n", "\[IndentingNewLine]", 
    RowBox[{"Manipulate", "[", 
     RowBox[{
      RowBox[{"plotP4", "[", 
@@ -180,7 +180,42 @@ Cell[BoxData[
    3.6800048577686043`*^9}, {3.68007268122519*^9, 3.680072741595599*^9}, {
    3.680072797715762*^9, 3.6800728085583572`*^9}, 3.6800729123973*^9, {
    3.680114654740238*^9, 3.680114664379278*^9}},
- FontSize->18]
+ FontSize->18],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"tabQ2", "[", "t_", "]"}], " ", ":=", " ", 
+   RowBox[{"DiscretePlot3D", "[", 
+    RowBox[{
+     RowBox[{"Quantile", "[", 
+      RowBox[{
+       RowBox[{"dist2", "[", 
+        RowBox[{"t", ",", " ", "a", ",", " ", "c"}], "]"}], ",", " ", 
+       RowBox[{"{", 
+        RowBox[{"0.05", ",", "0.95"}], "}"}]}], "]"}], ",", " ", 
+     RowBox[{"{", 
+      RowBox[{"a", ",", " ", "0", ",", " ", "t", ",", " ", "1"}], "}"}], ",", 
+     " ", 
+     RowBox[{"{", 
+      RowBox[{"c", ",", " ", "0", ",", " ", "t", ",", " ", "1"}], "}"}], ",", 
+     
+     RowBox[{"PlotRange", " ", "->", " ", "All"}], ",", " ", 
+     RowBox[{"AxesLabel", " ", "->", " ", 
+      RowBox[{"{", 
+       RowBox[{
+       "\"\<Left card. (a)\>\"", ",", " ", "\"\<Right card. (c)\>\"", ",", 
+        " ", "\"\<Result mean\>\""}], "}"}]}]}], "]"}]}], 
+  ";"}], "\[IndentingNewLine]", 
+ RowBox[{"tabQ2", "[", "9684", "]"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.68483991620858*^9, 3.684839976117949*^9}, {
+   3.6848400657846403`*^9, 3.684840066243465*^9}, {3.684840446322466*^9, 
+   3.684840470306499*^9}, {3.684840552793798*^9, 3.684840556618924*^9}, {
+   3.684840832372271*^9, 3.684840861171768*^9}, {3.6848410168746653`*^9, 
+   3.6848410198220997`*^9}, {3.684841068951558*^9, 3.684841095355817*^9}, {
+   3.684841150695434*^9, 3.6848411559606*^9}, {3.684841190748334*^9, 
+   3.6848412507774067`*^9}, {3.684841331116041*^9, 3.684841386589403*^9}, 
+   3.684842529472846*^9, {3.684842576183401*^9, 3.684842576419119*^9}}]
 },
 WindowSize->{913, 911},
 WindowMargins->{{Automatic, 143}, {Automatic, 169}},
@@ -201,7 +236,8 @@ CellTagsIndex->{}
 Notebook[{
 Cell[558, 20, 951, 19, 55, "Input",
  InitializationCell->True],
-Cell[1512, 41, 5556, 141, 707, "Input"]
+Cell[1512, 41, 5556, 141, 707, "Input"],
+Cell[7071, 184, 1547, 33, 96, "Input"]
 }
 ]
 *)
