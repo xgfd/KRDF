@@ -1,7 +1,7 @@
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.Property;
 import org.apache.jena.util.FileManager;
 
 import java.io.InputStream;
@@ -31,7 +31,7 @@ public class RDFGraph {
         return model.read(in, null);
     }
 
-    static public Collection<Node> getNeighbours(Node v, Property pre) {
+    static public Collection<Node> getNeighbours(Node v, Triple edge) {
         return null;
 
     }
