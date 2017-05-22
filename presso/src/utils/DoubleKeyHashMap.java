@@ -1,7 +1,11 @@
 package utils;
 
+import com.sun.istack.internal.NotNull;
+import com.sun.istack.internal.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Helper class for double-key hash map
@@ -13,6 +17,7 @@ import java.util.Map;
 public class DoubleKeyHashMap<K, T, V> {
     private HashMap<K, Map<T, V>> outterMap = new HashMap<K, Map<T, V>>();
 
+    @NotNull
     public HashMap<K, Map<T, V>> put(K k1, T k2, V val) {
         if (outterMap.get(k1) == null) {
             HashMap<T, V> innerMap = new HashMap<T, V>();
@@ -26,6 +31,7 @@ public class DoubleKeyHashMap<K, T, V> {
         return outterMap;
     }
 
+    @Nullable
     public V get(K k1, T k2) {
         Map<T, V> innerMap = outterMap.get(k1);
 
@@ -36,8 +42,14 @@ public class DoubleKeyHashMap<K, T, V> {
         }
     }
 
+    @NotNull
     public Map<T, V> get(K k1) {
         Map<T, V> innerMap = outterMap.get(k1);
-        return innerMap;
+
+        return Optional.ofNullable(innerMap).orElse(new HashMap<>()) ;
+    }
+
+    public void clear() {
+        outterMap.clear();
     }
 }

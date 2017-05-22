@@ -6,10 +6,7 @@ import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import utils.DoubleKeyHashMap;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by xgfd on 15/05/2017.
@@ -37,15 +34,20 @@ public class QueryGraph {
     }
 
     /**
-     * Represent the query graph as a collection of chains rooted at a node.
+     * Represent an ACYCLIC query graph as a collection of chains rooted at a node.
      *
      * @param v A node as the root of chains
      * @return A collection of chains
      */
-    public List<ArrayList<Triple>> asChains(Node v) {
-        Map<Node, List<Triple>> chains = incomingEdges.get(v);
-        return null;
+    public Collection<List<Triple>> asChains(Node v) {
+        Map<Node, List<Triple>> inChains = incomingEdges.get(v);
+        Map<Node, List<Triple>> outChains = outgoingEdges.get(v);
 
+        // collect chains from both incoming and outgoing predicates
+        Collection<List<Triple>> chains = inChains.values();
+        chains.addAll(outChains.values());
+
+        return chains;
     }
 
     private void addEdge(Triple t) {
