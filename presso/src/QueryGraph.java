@@ -13,8 +13,9 @@ import java.util.*;
  */
 public class QueryGraph {
 
-    private DoubleKeyHashMap<Node, Node, List<Triple>> incomingEdges = new DoubleKeyHashMap<>();
-    private DoubleKeyHashMap<Node, Node, List<Triple>> outgoingEdges = new DoubleKeyHashMap<>();
+    private final Node v;
+    private HashMap<Node, Set<Triple>> incomingEdges = new HashMap<>();
+    private HashMap<Node, Set<Triple>> outgoingEdges = new HashMap<>();
 
     public QueryGraph(String bgpString) {
         Query query = QueryFactory.create(bgpString);
@@ -33,13 +34,24 @@ public class QueryGraph {
 
     }
 
+    public Set<Triple> getIncomming(Node v) {
+        return incomingEdges.get(v);
+    }
+
+    public Set<Triple> getOutgoing(Node v) {
+        return outgoingEdges.get(v);
+    }
+
     /**
-     * Represent an ACYCLIC query graph as a collection of chains rooted at a node.
+     * Represent an ACYCLIC query graph as a set of chains rooted at a node.
+     * <p>
+     * The {@code Set<List>} type calculates hash code in the way that hash codes of ordered items (i.e. those in the list) are multiplied,
+     * and those of unordered items (i.e. chains in the set) are summed.
      *
      * @param v A node as the root of chains
-     * @return A collection of chains
+     * @return A set of chains
      */
-    public Collection<List<Triple>> asChains(Node v) {
+    public Set<List<Triple>> asChains(Node v) {
         Map<Node, List<Triple>> inChains = incomingEdges.get(v);
         Map<Node, List<Triple>> outChains = outgoingEdges.get(v);
 
@@ -47,32 +59,67 @@ public class QueryGraph {
         Collection<List<Triple>> chains = inChains.values();
         chains.addAll(outChains.values());
 
-        return chains;
+        return new HashSet(chains);
     }
 
     private void addEdge(Triple t) {
         Node s = t.getSubject(), p = t.getPredicate(), o = t.getObject();
-        addIncoming(o, p, t);
-        addOutgoing(s, p, t);
+        addIncoming(o, t);
+        addOutgoing(s, t);
     }
 
-    private void addIncoming(Node v, Node p, Triple t) {
-        addTo(v, p, t, incomingEdges);
+    private void addIncoming(Node v, Triple t) {
+        addTo(v, t, incomingEdges);
     }
 
-    private void addOutgoing(Node v, Node p, Triple t) {
-        addTo(v, p, t, outgoingEdges);
+    private void addOutgoing(Node v, Triple t) {
+        addTo(v, t, outgoingEdges);
     }
 
-    private void addTo(Node v, Node p, Triple t, DoubleKeyHashMap<Node, Node, List<Triple>> map) {
-        List<Triple> edges = map.get(v, p);
+    private void addTo(Node v, Triple t, Map<Node, Set<Triple>> map) {
+        List<Triple> edges = map.get(v);
 
         if (edges == null) {
-            edges = new ArrayList();
+            edges = new HashSet<>();
         }
 
         edges.add(t);
 
-        map.put(v, p, edges);
+        map.put(v, edges);
     }
+}
+
+/**
+ * Class and algorithms for detecting isomorphism of edge-labeled trees.
+ * A query graph (assumed to be acyclic) is represented as a edge-labeled (i.e. predicates) tree rooted at a concrete vertex,
+ * which is used as an index key to retrieve cached cardinality.
+ * An ELT is recursively defined as a set of ELTs decending from an anonymous node.
+ */
+private class ELT<E> {
+    // child tress connected by incoming edges
+    Set<Triple> incomings, outgoings;
+
+    // child tress connected by outgoing edges
+
+    public ELT(QueryGraph qg, Node root) {
+
+    }
+
+    @Override
+    public int hashCode() {
+
+    }
+
+
+    private Set<ELT> dfs(QueryGraph qg, Node root) {
+        Set<ELT> elts = new HashSet<>();
+
+        this.incomings = qg.getIncomming(root);
+        this.outgoings = qg.getoutgoing(root);
+
+
+
+    }
+
+
 }

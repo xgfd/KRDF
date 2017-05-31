@@ -1,18 +1,30 @@
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collection;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
 /**
- * Created by xgfd on 22/05/2017.
+ * Created by xgfd on 31/05/2017.
  */
-public class CardTest {
-    @Test
-    public void calCard() {
+public class CardinalityTest {
+    @Before
+    public void setUp() throws Exception {
         RDFGraph.readRDF("athlete.ttl");
+    }
+
+    @After
+    public void tearDown() throws Exception {
+    }
+
+    @Test
+    public void cardinality() throws Exception {
 
         String q = "prefix dbp:<http://dbpedia.org/ontology/>\n" +
                 "select *\n" +
@@ -31,6 +43,10 @@ public class CardTest {
         Collection<List<Triple>> chains = qg.asChains(v);
 
         int card = Cardinality.cardinality(v, chains);
-
     }
+
+    @Test
+    public void cardinality1() throws Exception {
+    }
+
 }
