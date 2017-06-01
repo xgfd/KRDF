@@ -4,7 +4,6 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
-import utils.DoubleKeyHashMap;
 
 import java.util.*;
 
@@ -93,33 +92,86 @@ public class QueryGraph {
  * Class and algorithms for detecting isomorphism of edge-labeled trees.
  * A query graph (assumed to be acyclic) is represented as a edge-labeled (i.e. predicates) tree rooted at a concrete vertex,
  * which is used as an index key to retrieve cached cardinality.
- * An ELT is recursively defined as a set of ELTs decending from an anonymous node.
+ * An ELT is recursively defined as a set of ELTs decending from an anonymous node linked by labeled edges.
  */
 private class ELT<E> {
     // child tress connected by incoming edges
-    Set<Triple> incomings, outgoings;
+    HashMap<Node, ELT> incomingELTs = new HashMap<>(),
+            outgoingELTs = new HashMap<>();
 
     // child tress connected by outgoing edges
 
     public ELT(QueryGraph qg, Node root) {
-
+        dfs(qg, root);
     }
 
+    /**
+     * SUM(incoming.hashCode + 31 * inELT.hashCode) + SUM(outgoing.hashCode + 47 * outELT.hashCode)
+     *
+     * @return The hash code of the ELT
+     */
     @Override
     public int hashCode() {
+        int hash = this.incomingELTs.keySet().stream()
+                .mapToInt(node -> {
+                    return node.hashCode() + 31 * this.incomingELTs.get(node).hashCode();
+                })
+                .sum();
 
+        hash += this.outgoingELTs.keySet().stream()
+                .mapToInt(node -> {
+                    return node.hashCode() + 47 * this.incomingELTs.get(node).hashCode();
+                })
+                .sum();
+
+        return hash;
     }
 
+//    static String indent = "";
+
+    @Override
+    public String toString() {
+
+        String str = "( " + this.hashCode();
+
+        String inString = this.incomingELTs.keySet().stream()
+                .map(node -> {
+                    return " <- " + node.hashCode() + " - " + this.incomingELTs.get(node).toString() + ";";
+                })
+                .reduce((a, b) -> a.concat(b));
+
+        String outString = this.outgoingELTs.keySet().stream()
+                .map(node -> {
+                    return " - " + node.hashCode() + " -> " + this.incomingELTs.get(node).toString() + ";";
+                })
+                .reduce((a, b) -> a.concat(b));
+
+        str += inString + outString;
+
+        // remove the ; at the end
+        if(str.lastIndexOf(";") == str.length() -1) {
+            str = str.substring(0, str.length() - 1);
+        }
+
+        str += " )";
+
+        return str;
+    }
 
     private Set<ELT> dfs(QueryGraph qg, Node root) {
         Set<ELT> elts = new HashSet<>();
 
-        this.incomings = qg.getIncomming(root);
-        this.outgoings = qg.getoutgoing(root);
+        Set<Triple> incomings = qg.getIncomming(root);
+        Set<Triple> outgoings = qg.getoutgoing(root);
 
+        incomings.stream().forEach(triple -> {
+            Node next = triple.getSubject();
+            this.incomingELTs.put(triple.getPredicate(), new ELT(qg, next));
+        });
 
-
+        outgoings.stream().forEach(triple -> {
+            Node next = triple.getObject();
+            this.outgoingELTs.put(triple.getPredicate(), new ELT(qg, next));
+        });
     }
-
-
 }
