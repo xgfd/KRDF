@@ -2,43 +2,66 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.syntax.Element;
+import org.apache.jena.sparql.syntax.ElementGroup;
+import org.apache.jena.sparql.syntax.ElementPathBlock;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 
 /**
  * Created by xgfd on 15/05/2017.
  */
-public class QueryGraph {
+class QueryGraph {
 
-    private final Node v;
     private HashMap<Node, Set<Triple>> incomingEdges = new HashMap<>();
     private HashMap<Node, Set<Triple>> outgoingEdges = new HashMap<>();
+    private Set<Node> concreteNodes = new HashSet<>();
+    static Set<Triple> visitedEdges = new HashSet<>();
 
-    public QueryGraph(String bgpString) {
+    QueryGraph(String bgpString) {
         Query query = QueryFactory.create(bgpString);
 
         Element pattern = query.getQueryPattern();
 
-        if (pattern instanceof ElementTriplesBlock) {
-            ElementTriplesBlock bgp = (ElementTriplesBlock) pattern;
-            Iterator<Triple> triples = bgp.patternElts();
-            while (triples.hasNext()) {
-                addEdge(triples.next());
+        if (pattern instanceof ElementGroup) {
+            List<Element> elements = ((ElementGroup) pattern).getElements();
+
+            ElementPathBlock bgp = null;
+            for (Element e : elements) {
+                int bgpCount = 0;
+                if (e instanceof ElementPathBlock) {
+                    bgp = (ElementPathBlock) e;
+                    bgpCount++;
+                    if (bgpCount > 1) {
+                        throw new IllegalArgumentException("Only support queries with a single BGP");
+                    }
+                }
             }
-        } else {
-            throw new IllegalArgumentException("Only support queries with a single BGP");
+
+            if (bgp != null) {
+                Iterator<TriplePath> triples = bgp.patternElts();
+                while (triples.hasNext()) {
+                    addEdge(triples.next().asTriple());
+                }
+            } else {
+                throw new IllegalArgumentException("No BGP found");
+            }
         }
-
     }
 
-    public Set<Triple> getIncomming(Node v) {
-        return incomingEdges.get(v);
+    Set<Triple> getIncomming(Node v) {
+        return Optional.ofNullable(incomingEdges.get(v)).orElse(new HashSet<>());
     }
 
-    public Set<Triple> getOutgoing(Node v) {
-        return outgoingEdges.get(v);
+    Set<Triple> getOutgoing(Node v) {
+        return Optional.ofNullable(outgoingEdges.get(v)).orElse(new HashSet<>());
+    }
+
+    Set<Node> getConcreteNodes() {
+        return this.concreteNodes;
     }
 
     /**
@@ -50,19 +73,22 @@ public class QueryGraph {
      * @param v A node as the root of chains
      * @return A set of chains
      */
-    public Set<List<Triple>> asChains(Node v) {
-        Map<Node, List<Triple>> inChains = incomingEdges.get(v);
-        Map<Node, List<Triple>> outChains = outgoingEdges.get(v);
-
-        // collect chains from both incoming and outgoing predicates
-        Collection<List<Triple>> chains = inChains.values();
-        chains.addAll(outChains.values());
-
-        return new HashSet(chains);
+    ELT asELT(Node v) {
+        visitedEdges.clear();
+        return new ELT(this, v);
     }
 
     private void addEdge(Triple t) {
-        Node s = t.getSubject(), p = t.getPredicate(), o = t.getObject();
+        Node s = t.getSubject(), o = t.getObject();
+
+        if (s.isConcrete()) {
+            this.concreteNodes.add(s);
+        }
+
+        if (o.isConcrete()) {
+            this.concreteNodes.add(o);
+        }
+
         addIncoming(o, t);
         addOutgoing(s, t);
     }
@@ -76,7 +102,7 @@ public class QueryGraph {
     }
 
     private void addTo(Node v, Triple t, Map<Node, Set<Triple>> map) {
-        List<Triple> edges = map.get(v);
+        Set<Triple> edges = map.get(v);
 
         if (edges == null) {
             edges = new HashSet<>();
@@ -94,14 +120,13 @@ public class QueryGraph {
  * which is used as an index key to retrieve cached cardinality.
  * An ELT is recursively defined as a set of ELTs decending from an anonymous node linked by labeled edges.
  */
-private class ELT<E> {
+class ELT {
     // child tress connected by incoming edges
-    HashMap<Node, ELT> incomingELTs = new HashMap<>(),
-            outgoingELTs = new HashMap<>();
+    private HashMap<Node, ELT> incomingELTs = new HashMap<>(), outgoingELTs = new HashMap<>();
 
     // child tress connected by outgoing edges
 
-    public ELT(QueryGraph qg, Node root) {
+    ELT(QueryGraph qg, Node root) {
         dfs(qg, root);
     }
 
@@ -113,44 +138,49 @@ private class ELT<E> {
     @Override
     public int hashCode() {
         int hash = this.incomingELTs.keySet().stream()
-                .mapToInt(node -> {
-                    return node.hashCode() + 31 * this.incomingELTs.get(node).hashCode();
-                })
+                .mapToInt(node -> node.hashCode() + 31 * this.incomingELTs.get(node).hashCode())
                 .sum();
 
         hash += this.outgoingELTs.keySet().stream()
-                .mapToInt(node -> {
-                    return node.hashCode() + 47 * this.incomingELTs.get(node).hashCode();
-                })
+                .mapToInt(node -> node.hashCode() + 47 * this.outgoingELTs.get(node).hashCode())
                 .sum();
 
         return hash;
     }
 
-//    static String indent = "";
 
     @Override
     public String toString() {
 
-        String str = "( " + this.hashCode();
+        String str = "( " + this.hashCode() + ", ";
 
         String inString = this.incomingELTs.keySet().stream()
-                .map(node -> {
-                    return " <- " + node.hashCode() + " - " + this.incomingELTs.get(node).toString() + ";";
-                })
-                .reduce((a, b) -> a.concat(b));
+                .map(node -> this.incomingELTs.get(node).toString() + ", ")
+                .reduce("", (a, b) -> a + b)
+                .toString();
 
         String outString = this.outgoingELTs.keySet().stream()
-                .map(node -> {
-                    return " - " + node.hashCode() + " -> " + this.incomingELTs.get(node).toString() + ";";
-                })
-                .reduce((a, b) -> a.concat(b));
+                .map(node -> this.outgoingELTs.get(node).toString() + ", ")
+                .reduce("", (a, b) -> a + b)
+                .toString();
 
         str += inString + outString;
 
+//        String inString = this.incomingELTs.keySet().stream()
+//                .map(node -> " <-[" + node.hashCode() + "]- " + this.incomingELTs.get(node).toString() + ";")
+//                .reduce("", (a, b) -> a + b)
+//                .toString();
+//
+//        String outString = this.outgoingELTs.keySet().stream()
+//                .map(node -> " -[" + node.hashCode() + "]-> " + this.outgoingELTs.get(node).toString() + ";")
+//                .reduce("", (a, b) -> a + b)
+//                .toString();
+//
+//        str += inString + outString;
+//
         // remove the ; at the end
-        if(str.lastIndexOf(";") == str.length() -1) {
-            str = str.substring(0, str.length() - 1);
+        if (str.lastIndexOf(",") == str.length() - 2) {
+            str = str.substring(0, str.length() - 2);
         }
 
         str += " )";
@@ -158,20 +188,24 @@ private class ELT<E> {
         return str;
     }
 
-    private Set<ELT> dfs(QueryGraph qg, Node root) {
-        Set<ELT> elts = new HashSet<>();
-
+    private void dfs(QueryGraph qg, Node root) {
         Set<Triple> incomings = qg.getIncomming(root);
-        Set<Triple> outgoings = qg.getoutgoing(root);
+        Set<Triple> outgoings = qg.getOutgoing(root);
 
-        incomings.stream().forEach(triple -> {
-            Node next = triple.getSubject();
-            this.incomingELTs.put(triple.getPredicate(), new ELT(qg, next));
+        incomings.forEach(triple -> {
+            if (!QueryGraph.visitedEdges.contains(triple)) {
+                QueryGraph.visitedEdges.add(triple);
+                Node next = triple.getSubject();
+                this.incomingELTs.put(triple.getPredicate(), new ELT(qg, next));
+            }
         });
 
-        outgoings.stream().forEach(triple -> {
-            Node next = triple.getObject();
-            this.outgoingELTs.put(triple.getPredicate(), new ELT(qg, next));
+        outgoings.forEach(triple -> {
+            if (!QueryGraph.visitedEdges.contains(triple)) {
+                QueryGraph.visitedEdges.add(triple);
+                Node next = triple.getObject();
+                this.outgoingELTs.put(triple.getPredicate(), new ELT(qg, next));
+            }
         });
     }
 }

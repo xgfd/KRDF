@@ -40,9 +40,9 @@ public class CardinalityTest {
 
         Node v = NodeFactory.createURI("http://dbpedia.org/ontology/Athlete");
 
-        Collection<List<Triple>> chains = qg.asChains(v);
+        ELT chains = qg.asELT(v);
 
-        int card = Cardinality.cardinality(v, chains);
+        int card = Cardinality.cardinality(v, null);
     }
 
     @Test
