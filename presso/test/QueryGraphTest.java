@@ -1,4 +1,6 @@
 import org.apache.jena.graph.Node;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,19 +16,7 @@ public class QueryGraphTest {
 
     @Before
     public void setUp() throws Exception {
-
-        String q = "PREFIX  xsd:  <http://www.w3.org/2001/XMLSchema#>\n" +
-                "PREFIX  rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-                "PREFIX dbp:<http://dbpedia.org/ontology/>\n" +
-                "SELECT *\n" +
-                "WHERE {\n" +
-                "        ?subOfAthlete rdfs:subClassOf dbp:Athlete .\n" +
-                "        ?subOfAthlete rdfs:label ?athleteGroup .\n" +
-                "        ?athlete a ?subOfAthlete .\n" +
-                "        ?athlete dbp:birthDate ?birth .\n" +
-                "        ?athlete dbp:deathDate ?death .\n" +
-                "} ";
-
+        Query q = QueryFactory.read("./athlete.rq");
         qg = new QueryGraph(q);
     }
 

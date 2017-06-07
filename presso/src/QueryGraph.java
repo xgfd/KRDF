@@ -19,11 +19,39 @@ class QueryGraph {
     private HashMap<Node, Set<Triple>> incomingEdges = new HashMap<>();
     private HashMap<Node, Set<Triple>> outgoingEdges = new HashMap<>();
     private Set<Node> concreteNodes = new HashSet<>();
+
     static Set<Triple> visitedEdges = new HashSet<>();
 
-    QueryGraph(String bgpString) {
-        Query query = QueryFactory.create(bgpString);
+    QueryGraph(Query query) {
+        init(query);
+    }
 
+    Set<Triple> getIncomming(Node v) {
+        return Optional.ofNullable(incomingEdges.get(v)).orElse(new HashSet<>());
+    }
+
+    Set<Triple> getOutgoing(Node v) {
+        return Optional.ofNullable(outgoingEdges.get(v)).orElse(new HashSet<>());
+    }
+
+    Set<Node> getConcreteNodes() {
+        return this.concreteNodes;
+    }
+
+    /**
+     * Represent an ACYCLIC query graph as a set of chains rooted at a node.
+     * The {@code Set<List>} type calculates hash code in the way that hash codes of ordered items (i.e. those in the list) are multiplied,
+     * and those of unordered items (i.e. chains in the set) are summed.
+     *
+     * @param v A node as the root of chains
+     * @return A set of chains
+     */
+    public ELT asELT(Node v) {
+        visitedEdges.clear();
+        return new ELT(this, v);
+    }
+
+    private void init(Query query) {
         Element pattern = query.getQueryPattern();
 
         if (pattern instanceof ElementGroup) {
@@ -50,32 +78,6 @@ class QueryGraph {
                 throw new IllegalArgumentException("No BGP found");
             }
         }
-    }
-
-    Set<Triple> getIncomming(Node v) {
-        return Optional.ofNullable(incomingEdges.get(v)).orElse(new HashSet<>());
-    }
-
-    Set<Triple> getOutgoing(Node v) {
-        return Optional.ofNullable(outgoingEdges.get(v)).orElse(new HashSet<>());
-    }
-
-    Set<Node> getConcreteNodes() {
-        return this.concreteNodes;
-    }
-
-    /**
-     * Represent an ACYCLIC query graph as a set of chains rooted at a node.
-     * <p>
-     * The {@code Set<List>} type calculates hash code in the way that hash codes of ordered items (i.e. those in the list) are multiplied,
-     * and those of unordered items (i.e. chains in the set) are summed.
-     *
-     * @param v A node as the root of chains
-     * @return A set of chains
-     */
-    ELT asELT(Node v) {
-        visitedEdges.clear();
-        return new ELT(this, v);
     }
 
     private void addEdge(Triple t) {

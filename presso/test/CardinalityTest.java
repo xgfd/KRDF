@@ -1,6 +1,8 @@
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.query.Query;
+import org.apache.jena.query.QueryFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,15 +28,7 @@ public class CardinalityTest {
     @Test
     public void cardinality() throws Exception {
 
-        String q = "prefix dbp:<http://dbpedia.org/ontology/>\n" +
-                "select *\n" +
-                "where {\n" +
-                "        ?subOfAthlete rdfs:subClassOf dbp:Athlete .\n" +
-                "        ?subOfAthlete rdfs:label ?athleteGroup .\n" +
-                "        ?athlete a ?subOfAthlete .\n" +
-                "        ?athlete dbp:birthDate ?birth .\n" +
-                "        ?athlete dbp:deathDate ?death .\n" +
-                "} ";
+        Query q = QueryFactory.read("./athlete.rq");
 
         QueryGraph qg = new QueryGraph(q);
 
