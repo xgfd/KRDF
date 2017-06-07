@@ -11,7 +11,7 @@ import java.util.*;
  */
 //TODO update cardinality calculation
 public class Cardinality {
-    static DoubleKeyHashMap<Node, List<Triple>, Integer> cache = new DoubleKeyHashMap<>();
+    static DoubleKeyHashMap<Node, ELT, Integer> cache = new DoubleKeyHashMap<>();
     static int cacheHit = 0;
     static int cacheNotHit = 0;
 
@@ -23,29 +23,17 @@ public class Cardinality {
      * At each vertex the number of paths linked by the same predicate are summed, while the number of paths from different predicates are multiplied.
      *
      * @param v          A vertex in RDF
-     * @param queryGraph A query graph in the form of a collection of predicate chains centered at {@code v}
+     * @param queryGraph A query graph in the form of a tree rooted at {@code v}
      * @return The number of graphs defined by the query graph {@code queryGraph} that contain the vertex {@code v}
      * @since 1.8
      */
-    static public int cardinality(Node v, Collection<List<Triple>> queryGraph) {
-        //TODO
-        return queryGraph.stream()
-                .map(predicateChain -> cardinality(v, v, predicateChain))
-                .reduce(1, (a, b) -> a * b);
-    }
-
-    /**
-     * Calculate the number of paths defined by a predicate chain that go through a vertex with memorisation.
-     *
-     * @see #_cardinality(Node, Node, List)
-     */
-    static public int cardinality(Node label, Node v, List<Triple> predicateChain) {
-        Integer cachedCard = cache.get(v, predicateChain);
+    static public int cardinality(Node v, ELT queryGraph) {
+        Integer cachedCard = cache.get(v, queryGraph);
 
         if (cachedCard == null) { // no cache available
             miss();
-            cachedCard = _cardinality(label, v, predicateChain);
-            cache.put(v, predicateChain, cachedCard);
+            cachedCard = _cardinality(v, queryGraph);
+            cache.put(v, queryGraph, cachedCard);
         } else {
             hit();
         }
@@ -74,15 +62,14 @@ public class Cardinality {
     /**
      * Recursively calculate the number of paths defined by a given predicate chain that go through a vertex in an RDF graph. The number of paths of neighbours following the same predicate are summed.
      *
-     * @param label          Corresponding node of the vertex {@code v} in the query graph from {@link #cardinality(Node, Collection)}
      * @param v              A vertex in RDF
-     * @param predicateChain A predicate chain pattern that defines paths
+     * @param queryGraph A predicate chain pattern that defines paths
      * @return Number of paths going through the vertex
      */
-    static private int _cardinality(Node label, Node v, List<Triple> predicateChain) {
+    static private int _cardinality(Node v, ELT queryGraph) {
 
         // every node at the end of the chain contributes 1 path
-        if (predicateChain.isEmpty()) {
+        if (queryGraph.isEmpty()) {
             return 1;
         }
 

@@ -5,7 +5,6 @@ import com.sun.istack.internal.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * Helper class for double-key hash map
@@ -44,9 +43,7 @@ public class DoubleKeyHashMap<K, T, V> {
 
     @NotNull
     public Map<T, V> get(K k1) {
-        Map<T, V> innerMap = outterMap.get(k1);
-
-        return Optional.ofNullable(innerMap).orElse(new HashMap<>()) ;
+        return  outterMap.getOrDefault(k1, new HashMap<>());
     }
 
     public void clear() {

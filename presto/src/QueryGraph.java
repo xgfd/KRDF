@@ -1,14 +1,12 @@
+import com.sun.istack.internal.NotNull;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryFactory;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
 import org.apache.jena.sparql.syntax.ElementPathBlock;
-import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 
-import javax.swing.text.html.Option;
 import java.util.*;
 
 /**
@@ -26,12 +24,14 @@ class QueryGraph {
         init(query);
     }
 
+    @NotNull
     Set<Triple> getIncomming(Node v) {
-        return Optional.ofNullable(incomingEdges.get(v)).orElse(new HashSet<>());
+        return incomingEdges.getOrDefault(v, new HashSet<>());
     }
 
+    @NotNull
     Set<Triple> getOutgoing(Node v) {
-        return Optional.ofNullable(outgoingEdges.get(v)).orElse(new HashSet<>());
+        return outgoingEdges.getOrDefault(v, new HashSet<>());
     }
 
     Set<Node> getConcreteNodes() {
@@ -123,6 +123,7 @@ class QueryGraph {
  * An ELT is recursively defined as a set of ELTs decending from an anonymous node linked by labeled edges.
  */
 class ELT {
+
     // child tress connected by incoming edges
     private HashMap<Node, ELT> incomingELTs = new HashMap<>(), outgoingELTs = new HashMap<>();
 
@@ -130,6 +131,19 @@ class ELT {
 
     ELT(QueryGraph qg, Node root) {
         dfs(qg, root);
+    }
+
+
+    public HashMap<Node, ELT> getIncomingELTs() {
+        return (HashMap<Node, ELT>) incomingELTs.clone();
+    }
+
+    public HashMap<Node, ELT> getOutgoingELTs() {
+        return (HashMap<Node, ELT>) outgoingELTs.clone();
+    }
+
+    public boolean isEmpty() {
+        return this.hashCode() == 0;
     }
 
     /**
