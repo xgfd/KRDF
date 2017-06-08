@@ -1,16 +1,10 @@
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
-import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Collection;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by xgfd on 31/05/2017.
@@ -18,7 +12,7 @@ import static org.junit.Assert.*;
 public class CardinalityTest {
     @Before
     public void setUp() throws Exception {
-        RDFGraph.readRDF("athlete.ttl");
+        RDFGraph.readRDF("./athlete.ttl");
     }
 
     @After
@@ -32,15 +26,20 @@ public class CardinalityTest {
 
         QueryGraph qg = new QueryGraph(q);
 
-        Node v = NodeFactory.createURI("http://dbpedia.org/ontology/Athlete");
+        qg.getConcreteNodes().stream()
+                .forEach(v -> {
+                    ELT elt = qg.asELT(v);
 
-        ELT chains = qg.asELT(v);
+                    int card = Cardinality.cardinality(v, elt);
 
-        int card = Cardinality.cardinality(v, null);
-    }
+                    System.out.println("*******************" + v + "********************");
+                    System.out.println(card);
+                    System.out.println("hit: " + Cardinality.cacheHit + "; miss: " + Cardinality.cacheMiss);
 
-    @Test
-    public void cardinality1() throws Exception {
+//                    Cardinality.resetCacheStats();
+
+                });
+        System.out.println("Cache: "+ Cardinality.cacheSize());
     }
 
 }

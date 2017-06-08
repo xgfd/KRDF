@@ -43,7 +43,14 @@ public class DoubleKeyHashMap<K, T, V> {
 
     @NotNull
     public Map<T, V> get(K k1) {
-        return  outterMap.getOrDefault(k1, new HashMap<>());
+        return outterMap.getOrDefault(k1, new HashMap<>());
+    }
+
+    public int size() {
+        return outterMap.keySet().stream()
+                .map(k -> outterMap.get(k))
+                .mapToInt(map -> map.size())
+                .sum();
     }
 
     public void clear() {

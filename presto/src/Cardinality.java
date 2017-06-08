@@ -11,29 +11,29 @@ import java.util.*;
  */
 //TODO update cardinality calculation
 public class Cardinality {
-    static DoubleKeyHashMap<Node, ELT, Integer> cache = new DoubleKeyHashMap<>();
+    static private DoubleKeyHashMap<Node, ELT, Integer> cache = new DoubleKeyHashMap<>();
     static int cacheHit = 0;
-    static int cacheNotHit = 0;
+    static int cacheMiss = 0;
 
-    static final String neighbourVar = "neighbour";
+    static private final String neighbourVar = "neighbour";
 
     /**
      * Calculate the number of trees defined by a collection of predicate chains that contain a vertex.
      * This number is recursively calculate by traversing the predicate chains with memorisation to reduce time complexity.
-     * At each vertex the number of paths linked by the same predicate are summed, while the number of paths from different predicates are multiplied.
      *
-     * @param v          A vertex in RDF
-     * @param queryGraph A query graph in the form of a tree rooted at {@code v}
-     * @return The number of graphs defined by the query graph {@code queryGraph} that contain the vertex {@code v}
+     * @param v   A vertex in RDF
+     * @param elt A query graph represented as a tree rooted at {@code v}
+     * @return The number of graphs defined by the query graph {@code elt} that contain the vertex {@code v}
+     * @see #_cardinality(Node, ELT)
      * @since 1.8
      */
-    static public int cardinality(Node v, ELT queryGraph) {
-        Integer cachedCard = cache.get(v, queryGraph);
+    static public int cardinality(Node v, ELT elt) {
+        Integer cachedCard = cache.get(v, elt);
 
         if (cachedCard == null) { // no cache available
             miss();
-            cachedCard = _cardinality(v, queryGraph);
-            cache.put(v, queryGraph, cachedCard);
+            cachedCard = _cardinality(v, elt);
+            cache.put(v, elt, cachedCard);
         } else {
             hit();
         }
@@ -46,90 +46,114 @@ public class Cardinality {
     }
 
     static public void miss() {
-        cacheNotHit++;
+        cacheMiss++;
+    }
+
+    static public int cacheSize() {
+        return cache.size();
     }
 
     static public void resetCacheStats() {
         cacheHit = 0;
-        cacheNotHit = 0;
+        cacheMiss = 0;
     }
 
     static public void clearCache() {
         cache.clear();
     }
 
-
     /**
-     * Recursively calculate the number of paths defined by a given predicate chain that go through a vertex in an RDF graph. The number of paths of neighbours following the same predicate are summed.
+     * Recursively calculate the number of paths defined by a given predicate chain that go through a vertex in an RDF graph.
+     * At each vertex the number of paths (sub-graphs) linked by the same predicate are summed,
+     * while the number of paths from different predicates are multiplied.
      *
-     * @param v              A vertex in RDF
-     * @param queryGraph A predicate chain pattern that defines paths
+     * @param v   A vertex in RDF
+     * @param elt
      * @return Number of paths going through the vertex
      */
-    static private int _cardinality(Node v, ELT queryGraph) {
+    static private int _cardinality(Node v, ELT elt) {
 
         // every node at the end of the chain contributes 1 path
-        if (queryGraph.isEmpty()) {
+        if (elt.isEmpty()) {
             return 1;
         }
 
+        Set<Node> inEdges = adjacentEdgesIn(elt);
+        int inCard = inEdges.stream()
+                .mapToInt(p -> cardinalityIn(v, p, elt)) // map each edge to the cardinality;
+                .reduce(1, (a, b) -> a * b); // product
 
-        int pathNum = 0;
+        Set<Node> outEdges = adjacentEdgesOut(elt);
+        int outCard = outEdges.stream()
+                .mapToInt(p -> cardinalityOut(v, p, elt))
+                .reduce(1, (a, b) -> a * b);
 
-        Triple headEdge = predicateChain.get(0);
-        ResultSet neighbours = getNeighbours(label, v, headEdge);
-
-        List<String> vars = neighbours.getResultVars();
-        assert vars.get(0) == neighbourVar;
-
-        Node neighbourLabel = otherEnd(v, headEdge);
-
-        while (neighbours.hasNext()) {
-            Node neighbour = neighbours.next().get(neighbourVar).asNode();
-
-            /** get the number of paths from each neighbour in the RDF graph and add them to the total number of
-             *  paths going through the vertex {@code v}
-             */
-            pathNum += cardinality(neighbourLabel, neighbour, new ArrayList<>(predicateChain.subList(1, predicateChain.size())));
-        }
-
-        return pathNum;
+        return inCard * outCard;
     }
 
     /**
-     * @param label Corresponding node of {@code v} in {@code edge}
-     * @param v     A concrete node
-     * @param edge
+     * Cardinality of a node {@code v} from a specific edge {@code p}.
+     * It's calculated as the sum of cardinality of its neighbours linked via {@code p}.
+     *
+     * @param v
+     * @param p
+     * @param queryGraph
+     * @return
+     */
+    static private int cardinalityIn(Node v, Node p, ELT queryGraph) {
+        return adjacentVerticesIn(v, p).stream() // get neighbours
+                .mapToInt(n -> cardinality(n, descendantTreeIn(p, queryGraph))) // map to neighbour's cardinality
+                .sum();
+    }
+
+    static private Set<Node> adjacentEdgesIn(ELT tree) {
+        return tree.getIncomingELTs().keySet();
+    }
+
+    static private ELT descendantTreeIn(Node p, ELT tree) {
+        return tree.getIncomingELTs().get(p);
+    }
+
+    /**
+     * @param v A concrete node
+     * @param p A predicate as an edge
      * @return Neighbours of {@code v} via {@code edge}
      */
-    static private ResultSet getNeighbours(Node label, Node v, Triple edge) {
+    static private List<Node> adjacentVerticesIn(Node v, Node p) {
         assert v.isConcrete();
+        assert p.isConcrete();
 
-        Node s = edge.getSubject(), o = edge.getObject();
-        assert label == s || label == o;
-
-        Node p = edge.getPredicate();
-
-        Triple t;
-        if (label == s) {
-            t = Triple.create(v, p, Var.alloc(neighbourVar));
-        } else {
-            t = Triple.create(Var.alloc(neighbourVar), p, v);
-        }
-
-        return RDFGraph.getNeighbours(t);
+        Triple t = Triple.create(Var.alloc(neighbourVar), p, v);
+        return solutionToNodes(RDFGraph.getNeighbours(t));
     }
 
-    /**
-     * Return the other end of an edge
-     *
-     * @param n    One end of an edge
-     * @param edge An edge
-     * @return The end of the edge that's different from {@code n}
-     */
-    static private Node otherEnd(Node n, Triple edge) {
-        Node a = edge.getSubject(), b = edge.getObject();
-        return a == n ? b : a;
+    //********************* same methods as above for outgoing edges ***********************************
+
+    static private int cardinalityOut(Node v, Node p, ELT queryGraph) {
+        return adjacentVerticesOut(v, p).stream() // get neighbours
+                .mapToInt(n -> cardinality(n, descendantTreeOut(p, queryGraph))) // map to neighbour's cardinality
+                .sum();
+    }
+
+    static private Set<Node> adjacentEdgesOut(ELT tree) {
+        return tree.getOutgoingELTs().keySet();
+    }
+
+    static private ELT descendantTreeOut(Node p, ELT tree) {
+        return tree.getOutgoingELTs().get(p);
+    }
+
+    static private List<Node> adjacentVerticesOut(Node v, Node p) {
+        assert v.isConcrete();
+        assert p.isConcrete();
+
+        Triple t = Triple.create(v, p, Var.alloc(neighbourVar));
+        return solutionToNodes(RDFGraph.getNeighbours(t));
+    }
+
+    static private List<Node> solutionToNodes(ResultSet rs) {
+        List<Node> adjV = new ArrayList<>();
+        rs.forEachRemaining(querySolution -> adjV.add(querySolution.get(neighbourVar).asNode()));
+        return adjV;
     }
 }
-

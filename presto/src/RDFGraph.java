@@ -18,17 +18,10 @@ public class RDFGraph {
     static Model model = ModelFactory.createDefaultModel();
 
     static public Model readRDF(String inputFileName) {
-        // use the FileManager to find the input file
-        InputStream in = FileManager.get().open(inputFileName);
-        if (in == null) {
-            throw new IllegalArgumentException("File: " + inputFileName + " not found");
-        }
-
         // clear cache since new triples may invalidate the cache
         Cardinality.clearCache();
 
-        // read the RDF/XML file
-        return model.read(in, null);
+        return model.read(inputFileName, null);
     }
 
     static public ResultSet getNeighbours(Triple t) {
