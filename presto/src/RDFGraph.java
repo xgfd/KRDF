@@ -36,4 +36,8 @@ public class RDFGraph {
 
         return QueryExecutionFactory.create(q, model).execSelect();
     }
+
+    static public long size() {
+        return model.size();
+    }
 }

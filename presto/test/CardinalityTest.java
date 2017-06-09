@@ -12,7 +12,9 @@ import org.junit.Test;
 public class CardinalityTest {
     @Before
     public void setUp() throws Exception {
+        System.out.println("Loading RDF ...");
         RDFGraph.readRDF("./athlete.ttl");
+        System.out.println("RDF loaded.");
     }
 
     @After
@@ -39,7 +41,6 @@ public class CardinalityTest {
 //                    Cardinality.resetCacheStats();
 
                 });
-        System.out.println("Cache: "+ Cardinality.cacheSize());
+        System.out.println("Cache size: " + Cardinality.cacheSize());
     }
-
 }

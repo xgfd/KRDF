@@ -18,8 +18,8 @@ public class Cardinality {
     static private final String neighbourVar = "neighbour";
 
     /**
-     * Calculate the number of trees defined by a collection of predicate chains that contain a vertex.
-     * This number is recursively calculate by traversing the predicate chains with memorisation to reduce time complexity.
+     * Calculate the number of trees defined by a query graph that contain a certain vertex.
+     * This number is recursively calculate by traversing the predicates of the query graph with memorisation to reduce time complexity.
      *
      * @param v   A vertex in RDF
      * @param elt A query graph represented as a tree rooted at {@code v}
