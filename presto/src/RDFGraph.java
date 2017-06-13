@@ -5,10 +5,9 @@ import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
-import org.apache.jena.util.FileManager;
 
-import java.io.InputStream;
 
 /**
  * Created by xgfd on 15/05/2017.
@@ -20,7 +19,6 @@ public class RDFGraph {
     static public Model readRDF(String inputFileName) {
         // clear cache since new triples may invalidate the cache
         Cardinality.clearCache();
-
         return model.read(inputFileName, null);
     }
 
@@ -34,6 +32,22 @@ public class RDFGraph {
         q.setQuerySelectType();
         q.setResultVars();
 
+        return execSelect(q);
+    }
+
+    static PrefixMapping withDefaultMappings(PrefixMapping pm) {
+        return model.withDefaultMappings(pm);
+    }
+
+    static PrefixMapping withDefaultMappings(QueryGraph qg) {
+        return model.withDefaultMappings(qg.getPrefixMapping());
+    }
+
+    static PrefixMapping getPrefixMapping() {
+        return PrefixMapping.Factory.create().setNsPrefixes(model.getNsPrefixMap());
+    }
+
+    static public ResultSet execSelect(Query q) {
         return QueryExecutionFactory.create(q, model).execSelect();
     }
 

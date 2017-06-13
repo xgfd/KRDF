@@ -1,7 +1,9 @@
 import com.sun.istack.internal.NotNull;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Node_URI;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
+import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.core.TriplePath;
 import org.apache.jena.sparql.syntax.Element;
 import org.apache.jena.sparql.syntax.ElementGroup;
@@ -16,6 +18,7 @@ class QueryGraph {
 
     private HashMap<Node, Set<Triple>> incomingEdges = new HashMap<>();
     private HashMap<Node, Set<Triple>> outgoingEdges = new HashMap<>();
+    private PrefixMapping pm;
     private Set<Node> concreteNodes = new HashSet<>();
 
     static Set<Triple> visitedEdges = new HashSet<>();
@@ -51,7 +54,13 @@ class QueryGraph {
         return new ELT(this, v);
     }
 
+    public PrefixMapping getPrefixMapping() {
+        return pm;
+    }
+
     private void init(Query query) {
+        this.pm = query.getPrefixMapping();
+
         Element pattern = query.getQueryPattern();
 
         if (pattern instanceof ElementGroup) {
@@ -116,112 +125,3 @@ class QueryGraph {
     }
 }
 
-/**
- * Class and algorithms for detecting isomorphism of edge-labeled trees.
- * A query graph (assumed to be acyclic) is represented as a edge-labeled (i.e. predicates) tree rooted at a concrete vertex,
- * which is used as an index key to retrieve cached cardinality.
- * An ELT is recursively defined as a set of ELTs decending from an anonymous node linked by labeled edges.
- */
-class ELT {
-
-    // child tress connected by incoming edges
-    private HashMap<Node, ELT> incomingELTs = new HashMap<>(), outgoingELTs = new HashMap<>();
-
-    // child tress connected by outgoing edges
-
-    ELT(QueryGraph qg, Node root) {
-        dfs(qg, root);
-    }
-
-
-    public HashMap<Node, ELT> getIncomingELTs() {
-        return (HashMap<Node, ELT>) incomingELTs.clone();
-    }
-
-    public HashMap<Node, ELT> getOutgoingELTs() {
-        return (HashMap<Node, ELT>) outgoingELTs.clone();
-    }
-
-    public boolean isEmpty() {
-        return this.hashCode() == 0;
-    }
-
-    /**
-     * SUM(incoming.hashCode + 31 * inELT.hashCode) + SUM(outgoing.hashCode + 47 * outELT.hashCode)
-     *
-     * @return The hash code of the ELT
-     */
-    @Override
-    public int hashCode() {
-        int hash = this.incomingELTs.keySet().stream()
-                .mapToInt(node -> node.hashCode() + 31 * this.incomingELTs.get(node).hashCode())
-                .sum();
-
-        hash += this.outgoingELTs.keySet().stream()
-                .mapToInt(node -> node.hashCode() + 47 * this.outgoingELTs.get(node).hashCode())
-                .sum();
-
-        return hash;
-    }
-
-
-    @Override
-    public String toString() {
-
-        String str = "( " + this.hashCode() + ", ";
-
-        String inString = this.incomingELTs.keySet().stream()
-                .map(node -> this.incomingELTs.get(node).toString() + ", ")
-                .reduce("", (a, b) -> a + b)
-                .toString();
-
-        String outString = this.outgoingELTs.keySet().stream()
-                .map(node -> this.outgoingELTs.get(node).toString() + ", ")
-                .reduce("", (a, b) -> a + b)
-                .toString();
-
-        str += inString + outString;
-
-//        String inString = this.incomingELTs.keySet().stream()
-//                .map(node -> " <-[" + node.hashCode() + "]- " + this.incomingELTs.get(node).toString() + ";")
-//                .reduce("", (a, b) -> a + b)
-//                .toString();
-//
-//        String outString = this.outgoingELTs.keySet().stream()
-//                .map(node -> " -[" + node.hashCode() + "]-> " + this.outgoingELTs.get(node).toString() + ";")
-//                .reduce("", (a, b) -> a + b)
-//                .toString();
-//
-//        str += inString + outString;
-//
-        // remove the ; at the end
-        if (str.lastIndexOf(",") == str.length() - 2) {
-            str = str.substring(0, str.length() - 2);
-        }
-
-        str += " )";
-
-        return str;
-    }
-
-    private void dfs(QueryGraph qg, Node root) {
-        Set<Triple> incomings = qg.getIncomming(root);
-        Set<Triple> outgoings = qg.getOutgoing(root);
-
-        incomings.forEach(triple -> {
-            if (!QueryGraph.visitedEdges.contains(triple)) {
-                QueryGraph.visitedEdges.add(triple);
-                Node next = triple.getSubject();
-                this.incomingELTs.put(triple.getPredicate(), new ELT(qg, next));
-            }
-        });
-
-        outgoings.forEach(triple -> {
-            if (!QueryGraph.visitedEdges.contains(triple)) {
-                QueryGraph.visitedEdges.add(triple);
-                Node next = triple.getObject();
-                this.outgoingELTs.put(triple.getPredicate(), new ELT(qg, next));
-            }
-        });
-    }
-}

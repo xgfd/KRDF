@@ -2,6 +2,7 @@ import org.apache.jena.graph.Node;
 import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.ResultSet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,21 +27,38 @@ public class CardinalityTest {
 
         Query q = QueryFactory.read("./athlete.rq");
 
+        int ref = 0;
+        ResultSet rs = RDFGraph.execSelect(q);
+        while (rs.hasNext()) {
+            rs.next();
+            ref++;
+        }
+//        System.out.println(ref);
+
         QueryGraph qg = new QueryGraph(q);
 
-        qg.getConcreteNodes().stream()
-                .forEach(v -> {
-                    ELT elt = qg.asELT(v);
+        Node v = qg.getConcreteNodes().iterator().next();
 
-                    int card = Cardinality.cardinality(v, elt);
+        ELT elt = qg.asELT(v);
 
-                    System.out.println("*******************" + v + "********************");
-                    System.out.println(card);
-                    System.out.println("hit: " + Cardinality.cacheHit + "; miss: " + Cardinality.cacheMiss);
+        int card = Cardinality.cardinality(v, elt);
 
-//                    Cardinality.resetCacheStats();
+        System.out.printf("%-50s %-10s %-10s %-10s %-10s%n", "Node", "Card.", "Hit", "Miss", "Cache size");
+        System.out.printf("%-50s %-10d %-10d %-10d %-10d%n", v, card, Cardinality.cacheHit, Cardinality.cacheMiss, Cardinality.cacheSize());
 
-                });
-        System.out.println("Cache size: " + Cardinality.cacheSize());
+        assert ref == card;
+
+//        qg.getConcreteNodes().stream()
+//                .forEach(v -> {
+//                    ELT elt = qg.asELT(v);
+//
+//                    int card = Cardinality.cardinality(v, elt);
+//
+//                    System.out.printf("%-50s %-10d %-10d %-10d%n", v, card, Cardinality.cacheHit, Cardinality.cacheMiss);
+//
+////                    Cardinality.resetCacheStats();
+//
+//                });
+
     }
 }

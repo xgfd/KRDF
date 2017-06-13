@@ -41,6 +41,10 @@ public class Cardinality {
         return cachedCard;
     }
 
+    static public int cardinality(ELT elt) {
+        return 0;
+    }
+
     static public void hit() {
         cacheHit++;
     }
@@ -78,17 +82,11 @@ public class Cardinality {
             return 1;
         }
 
-        Set<Node> inEdges = adjacentEdgesIn(elt);
-        int inCard = inEdges.stream()
-                .mapToInt(p -> cardinalityIn(v, p, elt)) // map each edge to the cardinality;
-                .reduce(1, (a, b) -> a * b); // product
+        int card = adjacentEdges(elt).stream()
+                .mapToInt(p -> cardinality(v, p, elt)) // map each edge to the cardinality of v on the defendant elt;
+                .reduce(1, (a, b) -> a * b); // product of cardinality from different edges
 
-        Set<Node> outEdges = adjacentEdgesOut(elt);
-        int outCard = outEdges.stream()
-                .mapToInt(p -> cardinalityOut(v, p, elt))
-                .reduce(1, (a, b) -> a * b);
-
-        return inCard * outCard;
+        return card;
     }
 
     /**
@@ -100,18 +98,18 @@ public class Cardinality {
      * @param queryGraph
      * @return
      */
-    static private int cardinalityIn(Node v, Node p, ELT queryGraph) {
-        return adjacentVerticesIn(v, p).stream() // get neighbours
-                .mapToInt(n -> cardinality(n, descendantTreeIn(p, queryGraph))) // map to neighbour's cardinality
+    static private int cardinality(Node v, DiPredicate p, ELT queryGraph) {
+        return adjacentVertices(v, p).stream() // get neighbours
+                .mapToInt(n -> cardinality(n, descendantTree(p, queryGraph))) // map to neighbour's cardinality
                 .sum();
     }
 
-    static private Set<Node> adjacentEdgesIn(ELT tree) {
-        return tree.getIncomingELTs().keySet();
+    static private Set<DiPredicate> adjacentEdges(ELT tree) {
+        return tree.getDecendantEdges();
     }
 
-    static private ELT descendantTreeIn(Node p, ELT tree) {
-        return tree.getIncomingELTs().get(p);
+    static private ELT descendantTree(DiPredicate p, ELT tree) {
+        return tree.getChild(p);
     }
 
     /**
@@ -119,35 +117,10 @@ public class Cardinality {
      * @param p A predicate as an edge
      * @return Neighbours of {@code v} via {@code edge}
      */
-    static private List<Node> adjacentVerticesIn(Node v, Node p) {
+    static private List<Node> adjacentVertices(Node v, DiPredicate p) {
         assert v.isConcrete();
-        assert p.isConcrete();
 
-        Triple t = Triple.create(Var.alloc(neighbourVar), p, v);
-        return solutionToNodes(RDFGraph.getNeighbours(t));
-    }
-
-    //********************* same methods as above for outgoing edges ***********************************
-
-    static private int cardinalityOut(Node v, Node p, ELT queryGraph) {
-        return adjacentVerticesOut(v, p).stream() // get neighbours
-                .mapToInt(n -> cardinality(n, descendantTreeOut(p, queryGraph))) // map to neighbour's cardinality
-                .sum();
-    }
-
-    static private Set<Node> adjacentEdgesOut(ELT tree) {
-        return tree.getOutgoingELTs().keySet();
-    }
-
-    static private ELT descendantTreeOut(Node p, ELT tree) {
-        return tree.getOutgoingELTs().get(p);
-    }
-
-    static private List<Node> adjacentVerticesOut(Node v, Node p) {
-        assert v.isConcrete();
-        assert p.isConcrete();
-
-        Triple t = Triple.create(v, p, Var.alloc(neighbourVar));
+        Triple t = p.isIncoming() ? Triple.create(Var.alloc(neighbourVar), p, v) : Triple.create(v, p, Var.alloc(neighbourVar));
         return solutionToNodes(RDFGraph.getNeighbours(t));
     }
 
