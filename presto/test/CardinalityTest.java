@@ -27,11 +27,17 @@ public class CardinalityTest {
 
         Query q = QueryFactory.read("./athlete.rq");
 
-        int ref = 0;
+        int ref_card = 0, ref_total = 0;
         ResultSet rs = RDFGraph.execSelect(q);
         while (rs.hasNext()) {
             rs.next();
-            ref++;
+            ref_card++;
+        }
+
+        rs = RDFGraph.execSelect(QueryFactory.read("./athlete_all_var.rq"));
+        while (rs.hasNext()) {
+            rs.next();
+            ref_total++;
         }
 //        System.out.println(ref);
 
@@ -41,12 +47,13 @@ public class CardinalityTest {
 
         ELT elt = qg.asELT(v);
 
-        int card = Cardinality.cardinality(v, elt);
+        int card = Cardinality.cardinality(v, elt), total = Cardinality.cardinality(elt);
 
-        System.out.printf("%-50s %-10s %-10s %-10s %-10s%n", "Node", "Card.", "Hit", "Miss", "Cache size");
-        System.out.printf("%-50s %-10d %-10d %-10d %-10d%n", v, card, Cardinality.cacheHit, Cardinality.cacheMiss, Cardinality.cacheSize());
+        System.out.printf("%-20s %-10s %-10s %-10s %-10s %-10s%n", "Node", "N Card.", "T Card.", "Hit", "Miss", "Cache size");
+        System.out.printf("%-20s %-10d %-10d %-10d %-10d %-10d%n", v.toString(RDFGraph.getPrefixMapping()), card, total, Cardinality.cacheHit, Cardinality.cacheMiss, Cardinality.cacheSize());
 
-        assert ref == card;
+        assert ref_card == card;
+        assert ref_total == total;
 
 //        qg.getConcreteNodes().stream()
 //                .forEach(v -> {

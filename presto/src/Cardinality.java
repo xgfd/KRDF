@@ -42,7 +42,18 @@ public class Cardinality {
     }
 
     static public int cardinality(ELT elt) {
-        return 0;
+        DiPredicate p = elt.getDecendantEdges().iterator().next();
+        Triple t = Triple.create(Var.alloc("s"), p, Var.alloc("o"));
+        ResultSet rs = RDFGraph.execTriple(t);
+
+        Set<Node> nodes = new HashSet<>();
+        rs.forEachRemaining(querySolution -> nodes.add(p.isIncoming() ? querySolution.get("o").asNode() : querySolution.get("s").asNode()));
+
+        int total = nodes.stream()
+                .mapToInt(node -> cardinality(node, elt)) // calculate cardinality for each node
+                .sum();
+
+        return total;
     }
 
     static public void hit() {
@@ -121,7 +132,7 @@ public class Cardinality {
         assert v.isConcrete();
 
         Triple t = p.isIncoming() ? Triple.create(Var.alloc(neighbourVar), p, v) : Triple.create(v, p, Var.alloc(neighbourVar));
-        return solutionToNodes(RDFGraph.getNeighbours(t));
+        return solutionToNodes(RDFGraph.execTriple(t));
     }
 
     static private List<Node> solutionToNodes(ResultSet rs) {

@@ -1,6 +1,5 @@
 import com.sun.istack.internal.NotNull;
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.Node_URI;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.Query;
 import org.apache.jena.shared.PrefixMapping;

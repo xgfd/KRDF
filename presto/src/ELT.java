@@ -4,10 +4,10 @@
 
 import org.apache.commons.lang3.builder.MultilineRecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Node_URI;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.shared.PrefixMapping;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -61,24 +61,7 @@ class ELT {
 
     @Override
     public String toString() {
-
-//        String str = "( " + this.hashCode() + ", ";
-//
-//        str += this.children.keySet().stream()
-//                .map(edge -> (edge.isIncoming() ? "<-" : "->") + this.children.get(edge).toString() + ", ")
-//                .reduce("", (a, b) -> a + b)
-//                .toString();
-//
-//        // remove the ; at the end
-//        if (str.lastIndexOf(",") == str.length() - 2) {
-//            str = str.substring(0, str.length() - 2);
-//        }
-//
-//        str += " )";
-//
-//        return str;
-
-        return new ReflectionToStringBuilder(this, new MultilineRecursiveToStringStyle()).toString();
+        return new ReflectionToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE).toString();
     }
 
     private void dfs(QueryGraph qg, Node root) {

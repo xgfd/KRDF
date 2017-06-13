@@ -22,7 +22,7 @@ public class RDFGraph {
         return model.read(inputFileName, null);
     }
 
-    static public ResultSet getNeighbours(Triple t) {
+    static public ResultSet execTriple(Triple t) {
         assert !t.isConcrete(); // should contain one (and only one) variable
 
         ElementTriplesBlock bgp = new ElementTriplesBlock(); // Make a BGP
