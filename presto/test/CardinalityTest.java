@@ -1,5 +1,4 @@
 import org.apache.jena.graph.Node;
-import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.ResultSet;
@@ -15,7 +14,7 @@ public class CardinalityTest {
     public void setUp() throws Exception {
         System.out.println("Loading RDF ...");
         RDFGraph.readRDF("./athlete.ttl");
-        System.out.println("RDF loaded.");
+        System.out.println(RDFGraph.size() + " statements loaded.");
     }
 
     @After
@@ -39,7 +38,6 @@ public class CardinalityTest {
             rs.next();
             ref_total++;
         }
-//        System.out.println(ref);
 
         QueryGraph qg = new QueryGraph(q);
 
@@ -49,8 +47,8 @@ public class CardinalityTest {
 
         int card = Cardinality.cardinality(v, elt), total = Cardinality.cardinality(elt);
 
-        System.out.printf("%-20s %-10s %-10s %-10s %-10s %-10s%n", "Node", "N Card.", "T Card.", "Hit", "Miss", "Cache size");
-        System.out.printf("%-20s %-10d %-10d %-10d %-10d %-10d%n", v.toString(RDFGraph.getPrefixMapping()), card, total, Cardinality.cacheHit, Cardinality.cacheMiss, Cardinality.cacheSize());
+        System.out.printf("%-40s %-15s %-15s %-15s %-15s %-15s%n", "Node", "Node_Card.", "Total_Card.", "Cache_Hit", "Cache_Miss", "Cache_Size");
+        System.out.printf("%-40s %-15d %-15d %-15d %-15d %-15d%n", v.toString(RDFGraph.getPrefixMapping()), card, total, Cardinality.cacheHit, Cardinality.cacheMiss, Cardinality.cacheSize());
 
         assert ref_card == card;
         assert ref_total == total;

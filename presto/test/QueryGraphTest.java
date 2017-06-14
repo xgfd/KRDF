@@ -17,7 +17,6 @@ public class QueryGraphTest {
 
     @Before
     public void setUp() throws Exception {
-//        RDFGraph.readRDF("./athlete.ttl");
         Query q = QueryFactory.read("./athlete.rq");
         qg = new QueryGraph(q);
         RDFGraph.withDefaultMappings(qg);

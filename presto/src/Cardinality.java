@@ -9,7 +9,6 @@ import java.util.*;
 /**
  * Created by xgfd on 05/05/2017.
  */
-//TODO update cardinality calculation
 public class Cardinality {
     static private DoubleKeyHashMap<Node, ELT, Integer> cache = new DoubleKeyHashMap<>();
     static int cacheHit = 0;

@@ -1,12 +1,12 @@
 PREFIX rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX xsd: <http://www.w4.org/2001/XMLSchema#>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX dbp: <http://dbpedia.org/ontology/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
 SELECT *
 WHERE {
-        ?subOfAthlete rdfs:subClassOf dbp:Athlete .
-        ?subOfAthlete rdfs:label ?athleteGroup .
-        ?athlete a ?subOfAthlete .
-        ?athlete dbp:birthDate ?birth .
-        ?athlete dbp:deathDate ?death .
+        dbo:BaseballPlayer rdfs:subClassOf ?Athlete .
+        dbo:BaseballPlayer rdfs:label ?athleteGroup .
+        ?athlete a dbo:BaseballPlayer .
+        ?athlete dbo:birthDate ?birth .
+        ?athlete dbo:deathDate ?death .
 }

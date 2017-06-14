@@ -35,20 +35,20 @@ public class RDFGraph {
         return execSelect(q);
     }
 
+    static public ResultSet execSelect(Query q) {
+        return QueryExecutionFactory.create(q, model).execSelect();
+    }
+
     static PrefixMapping withDefaultMappings(PrefixMapping pm) {
         return model.withDefaultMappings(pm);
     }
 
     static PrefixMapping withDefaultMappings(QueryGraph qg) {
-        return model.withDefaultMappings(qg.getPrefixMapping());
+        return withDefaultMappings(qg.getPrefixMapping());
     }
 
     static PrefixMapping getPrefixMapping() {
         return PrefixMapping.Factory.create().setNsPrefixes(model.getNsPrefixMap());
-    }
-
-    static public ResultSet execSelect(Query q) {
-        return QueryExecutionFactory.create(q, model).execSelect();
     }
 
     static public long size() {
