@@ -35,36 +35,39 @@ public class MTConnector {
             // when it is launched.
             ml.discardAnswer();
 
-            Path packagePath = Paths.get("../mathematica/distDef.m").toAbsolutePath();
+            Path packagePath = Paths.get("mathematica/distDef.m").toAbsolutePath();
 
             System.out.println(packagePath);
 
-            ml.evaluate("<<" + packagePath.toString());
+            ml.evaluate("<<" + packagePath);
+
             ml.discardAnswer();
 
-            ml.evaluate("2+2");
-            ml.waitForAnswer();
-
-            int result = ml.getInteger();
-            System.out.println("2 + 2 = " + result);
+//            ml.evaluate("mdf2[10, 2, 3, 1]");
+//            ml.waitForAnswer();
+//
+//            double result = ml.getDouble();
+//            System.out.println("mdf2[10, 2, 3, 1] = " + result);
 
             // Here's how to send the same input, but not as a string:
             ml.putFunction("EvaluatePacket", 1);
-            ml.putFunction("Plus", 2);
+            ml.putFunction("mdf2", 4);
+            ml.put(10);
+            ml.put(2);
             ml.put(3);
-            ml.put(3);
+            ml.put(1);
             ml.endPacket();
             ml.waitForAnswer();
-            result = ml.getInteger();
-            System.out.println("3 + 3 = " + result);
+            double result = ml.getInteger();
+            System.out.println("mdf2[10, 2, 3, 1] = " + result);
 
             // If you want the result back as a string, use evaluateToInputForm
             // or evaluateToOutputForm. The second arg for either is the
             // requested page width for formatting the string. Pass 0 for
             // PageWidth->Infinity. These methods get the result in one
             // step--no need to call waitForAnswer.
-            String strResult = ml.evaluateToOutputForm("4+4", 0);
-            System.out.println("4 + 4 = " + strResult);
+//            String strResult = ml.evaluateToOutputForm("4+4", 0);
+//            System.out.println("4 + 4 = " + strResult);
 
         } catch (MathLinkException e) {
             System.out.println("MathLinkException occurred: " + e.getMessage());
