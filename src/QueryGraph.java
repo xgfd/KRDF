@@ -26,6 +26,10 @@ class QueryGraph {
         init(query);
     }
 
+    QueryGraph(ElementPathBlock bgp) {
+        init(bgp);
+    }
+
     @NotNull
     Set<Triple> getIncomming(Node v) {
         return incomingEdges.getOrDefault(v, new HashSet<>());
@@ -78,13 +82,17 @@ class QueryGraph {
             }
 
             if (bgp != null) {
-                Iterator<TriplePath> triples = bgp.patternElts();
-                while (triples.hasNext()) {
-                    addEdge(triples.next().asTriple());
-                }
+                init(bgp);
             } else {
                 throw new IllegalArgumentException("No BGP found");
             }
+        }
+    }
+
+    private void init(ElementPathBlock bgp) {
+        Iterator<TriplePath> triples = bgp.patternElts();
+        while (triples.hasNext()) {
+            addEdge(triples.next().asTriple());
         }
     }
 

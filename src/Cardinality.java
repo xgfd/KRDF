@@ -55,6 +55,20 @@ public class Cardinality {
         return total;
     }
 
+    /**
+     * Calculate the cardinality of a query
+     * @param qg
+     * @return
+     */
+    //TODO add caching for query graphs
+    static public int cardinality(QueryGraph qg) {
+        // get an arbitrary ELT
+        Node n = qg.getConcreteNodes().iterator().next();
+        ELT elt = qg.asELT(n);
+
+        return cardinality(elt);
+    }
+
     static public void hit() {
         cacheHit++;
     }
