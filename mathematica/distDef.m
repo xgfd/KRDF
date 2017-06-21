@@ -59,7 +59,7 @@ Print["bottom",bottom[c1,t],"top",top[c1]];*)
 
 (*convert mdf to distribution*)
 dist2[t_, a_, c_] := ProbabilityDistribution[mdf2[t, a, c, r], {r, Max[a + c - t, 0], Min[a, c], 1}];
-dist[t_, c_]:=ProbabilityDistribution[mdf[t, c, r], {r, bottom[c], top[c], 1}];
+dist[t_, c_]:=ProbabilityDistribution[mdf[t, c, r], {r, bottom[c,t], top[c], 1}];
 
 (*calculate the 90% crediable interval*)
 ci90[t_,c_]:=Quantile[dist[t,c],{0.05,0.95}];
