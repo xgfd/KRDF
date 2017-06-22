@@ -5,6 +5,9 @@ import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -14,31 +17,50 @@ public class Presto {
     static final Map<String, List<String>> params = new HashMap<>();
 
     static public void main(String[] args) {
-        // -q path/to/query/file
-        // -f path/to/query/file/folder
+        // -m path to an RDF file
+        // -q path to query file
+        // -f path to query file folder
         parseParams(args);
 
-        List<String> filePaths = params.get("q"), folderPaths = params.get("f");
+        List<String> filePaths = params.getOrDefault("q", new ArrayList<>()),
+                folderPaths = params.getOrDefault("f", new ArrayList<>()),
+                model = params.getOrDefault("m", new ArrayList<>());
 
-        if (filePaths == null && folderPaths == null) {
-            System.out.println("Invalid parameters. Use -q for query files separated by spaces or -f for a folder of query files.");
+        if (filePaths.size() == 0 && folderPaths.size() == 0 && model.size() == 0) {
+            System.out.printf("%s%n%s%n%s%n%s", "Presto -m RDF_file [-q query_file query_file... | -f folder folder...]", "-m: path to an RDF file", "-q: paths to query files", "-f: paths to folders of query files (.rq)");
+            return;
         }
 
-        if (filePaths != null) {
-            int[][] estimates = (int[][]) filePaths.stream()
-                    .map(path -> QueryFactory.read(path))
-                    .map(query -> esti(query))
-                    .toArray();
-
-            System.out.println(Arrays.toString(estimates));
+        if (model.size() == 0) {
+            System.out.println("Missing RDF. Use -m for an RDF file.");
+            return;
         }
 
-        //TODO
-//        if (folderPaths != null) {
-//            Path folder = Paths.get(folderPaths.get(0));
-//
-//        }
+        if (filePaths.size() == 0 && folderPaths.size() == 0) {
+            System.out.println("Missing query file(s). Use -q for query files separated by spaces or -f for folders of query files.");
+            return;
+        }
 
+        RDFGraph.readRDF(model.get(0));
+
+        filePaths.stream()
+                .map(path -> QueryFactory.read(path)) // file path to query
+                .map(query -> esti(query)) // to credible intervals int[]
+                .map(Arrays::toString) // prepare for printing
+                .forEach(System.out::println);
+
+        for (String folderPath : folderPaths) {
+            try {
+                Files.walk(Paths.get(folderPath))
+                        .filter(Files::isRegularFile)
+                        .map(path -> QueryFactory.read(path.toString()))
+                        .map(query -> esti(query))
+                        .map(Arrays::toString)
+                        .forEach(System.out::println);
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     /**
@@ -65,16 +87,16 @@ public class Presto {
         // calculate the total cardinality
         int total = Cardinality.cardinality(qg);
 
+        int[] interval = null;
         try {
             // calculate 90% credible interval
-            return M.ci90(total, cardinalities);
+            interval = M.ci90(total, cardinalities);
         } catch (MathLinkException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         } catch (ExprFormatException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
-
-        return null;
+        return interval;
     }
 
     static private void parseParams(String[] args) {

@@ -1,7 +1,6 @@
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
-import org.apache.jena.shared.PrefixMapping;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +16,7 @@ public class QueryGraphTest {
 
     @Before
     public void setUp() throws Exception {
-        Query q = QueryFactory.read("./athlete.rq");
+        Query q = QueryFactory.read("card_test.rq");
         qg = new QueryGraph(q);
         RDFGraph.withDefaultMappings(qg);
     }
