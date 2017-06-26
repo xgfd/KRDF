@@ -13,7 +13,7 @@ public class CardinalityTest {
     @Before
     public void setUp() throws Exception {
         System.out.println("Loading RDF ...");
-        RDFGraph.readRDF("./athlete.ttl");
+        RDFGraph.initRDF("./athlete.ttl");
         System.out.println(RDFGraph.size() + " statements loaded.");
     }
 
