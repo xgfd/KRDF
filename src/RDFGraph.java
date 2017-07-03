@@ -1,12 +1,13 @@
+import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
-import org.apache.jena.query.Query;
-import org.apache.jena.query.QueryExecutionFactory;
-import org.apache.jena.query.QueryFactory;
-import org.apache.jena.query.ResultSet;
+import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.apache.jena.vocabulary.OWLResults.system;
 
@@ -37,19 +38,28 @@ public class RDFGraph {
         }
     }
 
-    static public ResultSet execTriple(Triple t) {
+    static public List<QuerySolution> execTriple(Triple t) {
         if (debug) {
             System.out.println(t);
         }
         return execSelect(buildQuery(t));
     }
 
-    static public ResultSet execSelect(Query q) {
-        if (isRemote()) {
-            return QueryExecutionFactory.sparqlService(remoteSPARQL, q).execSelect();
-        } else {
-            return QueryExecutionFactory.create(q, model).execSelect();
+    static public List<QuerySolution> execSelect(Query q) {
+        if (debug) {
+//            System.out.println(q);
         }
+
+        QueryExecution qex;
+        if (isRemote()) {
+            qex = QueryExecutionFactory.sparqlService(remoteSPARQL, q);
+        } else {
+            qex = QueryExecutionFactory.create(q, model);
+        }
+
+        List<QuerySolution> results = materilise(qex.execSelect());
+        qex.close(); // remote endpoints may limit the number of connections and cause further execution to hang
+        return results;
     }
 
     static PrefixMapping withDefaultMappings(PrefixMapping pm) {
@@ -84,5 +94,11 @@ public class RDFGraph {
         q.setResultVars();
 //        System.out.println(q);
         return q;
+    }
+
+    static private List<QuerySolution> materilise(ResultSet rs) {
+        List<QuerySolution> results = new ArrayList();
+        rs.forEachRemaining(querySolution -> results.add(querySolution));
+        return results;
     }
 }

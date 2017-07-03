@@ -1,10 +1,13 @@
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * Created by xgfd on 31/05/2017.
@@ -27,17 +30,11 @@ public class CardinalityTest {
         Query q = QueryFactory.read("queries/card_test.rq");
 
         int ref_card = 0, ref_total = 0;
-        ResultSet rs = RDFGraph.execSelect(q);
-        while (rs.hasNext()) {
-            rs.next();
-            ref_card++;
-        }
+        List<QuerySolution> rs = RDFGraph.execSelect(q);
+        ref_card += rs.size();
 
         rs = RDFGraph.execSelect(QueryFactory.read("queries/ref_card_test.rq"));
-        while (rs.hasNext()) {
-            rs.next();
-            ref_total++;
-        }
+        ref_total += rs.size();
 
         QueryGraph qg = new QueryGraph(q);
 

@@ -1,5 +1,6 @@
 import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
+import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
 import org.apache.jena.sparql.core.Var;
 import utils.DoubleKeyHashMap;
@@ -43,10 +44,10 @@ public class Cardinality {
     static public int cardinality(ELT elt) {
         DiPredicate p = elt.getDescendantEdges().iterator().next();
         Triple t = Triple.create(Var.alloc("s"), p, Var.alloc("o"));
-        ResultSet rs = RDFGraph.execTriple(t);
+        List<QuerySolution> rs = RDFGraph.execTriple(t);
 
         Set<Node> roots = new HashSet<>();
-        rs.forEachRemaining(querySolution -> roots.add(p.isIncoming() ? querySolution.get("o").asNode() : querySolution.get("s").asNode()));
+        rs.forEach(querySolution -> roots.add(p.isIncoming() ? querySolution.get("o").asNode() : querySolution.get("s").asNode()));
 
         int total = roots.stream()
                 .mapToInt(node -> cardinality(node, elt)) // calculate cardinality for each node
@@ -105,9 +106,13 @@ public class Cardinality {
             return 1;
         }
 
-        int card = adjacentEdges(elt).stream()
-                .mapToInt(p -> cardinality(v, p, elt)) // map each edge to the cardinality of v on the defendant elt;
-                .reduce(1, (a, b) -> a * b); // product of cardinality from different edges
+        int card = 1;
+        for (DiPredicate p : adjacentEdges(elt)) {
+            card *= cardinality(v, p, elt);
+            if (card == 0) {
+                return card;
+            }
+        }
 
         return card;
     }
@@ -122,6 +127,12 @@ public class Cardinality {
      * @return
      */
     static private int cardinality(Node v, DiPredicate p, ELT queryGraph) {
+//        int card = 0;
+//        for (Node n : adjacentVertices(v, p)) {
+//            card += cardinality(n, descendantTree(p, queryGraph));
+//        }
+//
+//        return card;
         return adjacentVertices(v, p).stream() // get neighbours
                 .mapToInt(n -> cardinality(n, descendantTree(p, queryGraph))) // map to neighbour's cardinality
                 .sum();
@@ -144,12 +155,12 @@ public class Cardinality {
         assert v.isConcrete();
 
         Triple t = p.isIncoming() ? Triple.create(Var.alloc(neighbourVar), p, v) : Triple.create(v, p, Var.alloc(neighbourVar));
-        return solutionToNodes(RDFGraph.execTriple(t));
+        return getNeighbourVal(RDFGraph.execTriple(t));
     }
 
-    static private List<Node> solutionToNodes(ResultSet rs) {
+    static private List<Node> getNeighbourVal(List<QuerySolution> rs) {
         List<Node> adjV = new ArrayList<>();
-        rs.forEachRemaining(querySolution -> adjV.add(querySolution.get(neighbourVar).asNode()));
+        rs.forEach(querySolution -> adjV.add(querySolution.get(neighbourVar).asNode()));
         return adjV;
     }
 }
