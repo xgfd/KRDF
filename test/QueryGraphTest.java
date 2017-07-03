@@ -16,7 +16,7 @@ public class QueryGraphTest {
 
     @Before
     public void setUp() throws Exception {
-        Query q = QueryFactory.read("card_test.rq");
+        Query q = QueryFactory.read("queries/q8.rq");
         qg = new QueryGraph(q);
         RDFGraph.withDefaultMappings(qg);
     }
@@ -34,6 +34,12 @@ public class QueryGraphTest {
             ELT elt = qg.asELT(node);
             System.out.println(elt.toString());
         });
+    }
+
+    @Test
+    public void asELTAllVar() throws Exception {
+        ELT elt = qg.asELT();
+        System.out.println(elt.toString());
     }
 
 }

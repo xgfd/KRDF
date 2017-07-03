@@ -8,6 +8,8 @@ import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.shared.PrefixMapping;
 import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 
+import static org.apache.jena.vocabulary.OWLResults.system;
+
 
 /**
  * Created by xgfd on 15/05/2017.
@@ -16,6 +18,7 @@ public class RDFGraph {
     // create an empty model
     static Model model = ModelFactory.createDefaultModel();
     static String remoteSPARQL = null;
+    static public boolean debug = false;
 
     /**
      * Initiate RDF store with local file or connect to a remote SPARQL endpoint.
@@ -35,6 +38,9 @@ public class RDFGraph {
     }
 
     static public ResultSet execTriple(Triple t) {
+        if (debug) {
+            System.out.println(t);
+        }
         return execSelect(buildQuery(t));
     }
 

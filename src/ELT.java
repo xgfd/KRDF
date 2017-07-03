@@ -16,21 +16,24 @@ import java.util.Set;
  * Class and algorithms for detecting isomorphism of edge-labeled trees.
  * A query graph (assumed to be acyclic) is represented as a edge-labeled (i.e. predicates) tree rooted at a concrete vertex,
  * which is used as an index key to retrieve cached cardinality.
- * An ELT is recursively defined as a set of ELTs decending from an anonymous node linked by labeled edges.
+ * An ELT is recursively defined as a set of ELTs descending from an anonymous node linked by labeled edges.
  */
 class ELT {
 
+    // root node
+    private Node root = null;
     // child tress connected by directed edges
     private HashMap<DiPredicate, ELT> children = new HashMap<>();
 
     // child tress connected by outgoing edges
 
     public ELT(QueryGraph qg, Node root) {
+        this.root = root;
         dfs(qg, root);
     }
 
 
-    public Set<DiPredicate> getDecendantEdges() {
+    public Set<DiPredicate> getDescendantEdges() {
         return children.keySet();
     }
 
@@ -114,6 +117,6 @@ class DiPredicate extends Node_URI {
 
     @Override
     public String toString() {
-        return super.toString(RDFGraph.getPrefixMapping());
+        return (incoming ? "<-" : "->") + super.toString(RDFGraph.getPrefixMapping());
     }
 }

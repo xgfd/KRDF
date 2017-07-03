@@ -19,6 +19,7 @@ class QueryGraph {
     private HashMap<Node, Set<Triple>> outgoingEdges = new HashMap<>();
     private PrefixMapping pm;
     private Set<Node> concreteNodes = new HashSet<>();
+    private Set<Node> varNodes = new HashSet<>();
 
     static Set<Triple> visitedEdges = new HashSet<>();
 
@@ -45,15 +46,27 @@ class QueryGraph {
     }
 
     /**
-     * Represent an ACYCLIC query graph as a set of chains rooted at a node.
-     * The {@code Set<List>} type calculates hash code in the way that hash codes of ordered items (i.e. those in the list) are multiplied,
-     * and those of unordered items (i.e. chains in the set) are summed.
+     * Represent an acyclic query graph as a rooted tree.
+     * The {@code Set<List>} type calculates hash code in the way that hash codes of ordered sub-trees (i.e. those in the list) are multiplied,
+     * and those of unordered items (i.e. those in the set) are summed.
      *
      * @param v A node as the root of chains
      * @return A set of chains
      */
     public ELT asELT(Node v) {
         visitedEdges.clear();
+        return new ELT(this, v);
+    }
+
+    /**
+     * Select an arbitrary node (concrete or variable) and represent the query graph as a tree rooted at that node.
+     *
+     * @return
+     * @see #asELT(Node)
+     */
+    public ELT asELT() {
+        visitedEdges.clear();
+        Node v = this.concreteNodes.size() > 0 ? this.concreteNodes.iterator().next() : this.varNodes.iterator().next();
         return new ELT(this, v);
     }
 
@@ -101,10 +114,14 @@ class QueryGraph {
 
         if (s.isConcrete()) {
             this.concreteNodes.add(s);
+        } else {
+            this.varNodes.add(s);
         }
 
         if (o.isConcrete()) {
             this.concreteNodes.add(o);
+        } else {
+            this.varNodes.add(o);
         }
 
         addIncoming(o, t);

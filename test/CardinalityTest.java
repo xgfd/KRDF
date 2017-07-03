@@ -24,7 +24,7 @@ public class CardinalityTest {
     @Test
     public void cardinality() throws Exception {
 
-        Query q = QueryFactory.read("card_test.rq");
+        Query q = QueryFactory.read("queries/card_test.rq");
 
         int ref_card = 0, ref_total = 0;
         ResultSet rs = RDFGraph.execSelect(q);
@@ -33,7 +33,7 @@ public class CardinalityTest {
             ref_card++;
         }
 
-        rs = RDFGraph.execSelect(QueryFactory.read("ref_card_test.rq"));
+        rs = RDFGraph.execSelect(QueryFactory.read("queries/ref_card_test.rq"));
         while (rs.hasNext()) {
             rs.next();
             ref_total++;

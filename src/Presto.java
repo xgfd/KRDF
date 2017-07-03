@@ -20,11 +20,18 @@ public class Presto {
         // -m path to an RDF file
         // -q path to query file
         // -f path to query file folder
+        // -v verbose output
         parseParams(args);
 
         List<String> filePaths = params.getOrDefault("q", new ArrayList<>()),
                 folderPaths = params.getOrDefault("f", new ArrayList<>()),
                 model = params.getOrDefault("m", new ArrayList<>());
+
+        boolean verbose = params.get("v") != null;
+
+        if (verbose) {
+            RDFGraph.debug = true;
+        }
 
         if (filePaths.size() == 0 && folderPaths.size() == 0 && model.size() == 0) {
             System.out.printf("%s%n%s%n%s%n%s", "Presto -m RDF_file or a SPARQL endpoint [-q query_file query_file... | -f folder folder...]", "-m: path to an RDF file", "-q: paths to query files", "-f: paths to folders of query files (.rq)");
@@ -32,7 +39,7 @@ public class Presto {
         }
 
         if (model.size() == 0) {
-            System.out.println("Missing RDF. Use -m for an RDF file or a SPARQL endpoint.");
+            System.out.println("Missing RDF. Use -m for an RDF file or a SPARQL endpoint URL.");
             return;
         }
 

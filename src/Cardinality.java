@@ -41,14 +41,14 @@ public class Cardinality {
     }
 
     static public int cardinality(ELT elt) {
-        DiPredicate p = elt.getDecendantEdges().iterator().next();
+        DiPredicate p = elt.getDescendantEdges().iterator().next();
         Triple t = Triple.create(Var.alloc("s"), p, Var.alloc("o"));
         ResultSet rs = RDFGraph.execTriple(t);
 
-        Set<Node> nodes = new HashSet<>();
-        rs.forEachRemaining(querySolution -> nodes.add(p.isIncoming() ? querySolution.get("o").asNode() : querySolution.get("s").asNode()));
+        Set<Node> roots = new HashSet<>();
+        rs.forEachRemaining(querySolution -> roots.add(p.isIncoming() ? querySolution.get("o").asNode() : querySolution.get("s").asNode()));
 
-        int total = nodes.stream()
+        int total = roots.stream()
                 .mapToInt(node -> cardinality(node, elt)) // calculate cardinality for each node
                 .sum();
 
@@ -57,14 +57,13 @@ public class Cardinality {
 
     /**
      * Calculate the cardinality of a query
+     *
      * @param qg
      * @return
      */
     //TODO add caching for query graphs
     static public int cardinality(QueryGraph qg) {
-        // get an arbitrary ELT
-        Node n = qg.getConcreteNodes().iterator().next();
-        ELT elt = qg.asELT(n);
+        ELT elt = qg.asELT();
 
         return cardinality(elt);
     }
@@ -129,7 +128,7 @@ public class Cardinality {
     }
 
     static private Set<DiPredicate> adjacentEdges(ELT tree) {
-        return tree.getDecendantEdges();
+        return tree.getDescendantEdges();
     }
 
     static private ELT descendantTree(DiPredicate p, ELT tree) {

@@ -6,7 +6,7 @@ import org.junit.Test;
 public class PrestoTest {
     @Test
     public void main() throws Exception {
-        String[] args = {"-m", "./athlete.ttl", "-q", "card_test.rq"};
+        String[] args = {"-m", "http://spr-001.ecs.soton.ac.uk:8890/sparql", "-q", "queries/q8.rq", "-v"};
 
         Presto.main(args);
     }
