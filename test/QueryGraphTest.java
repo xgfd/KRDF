@@ -16,7 +16,7 @@ public class QueryGraphTest {
 
     @Before
     public void setUp() throws Exception {
-        Query q = QueryFactory.read("queries/q8.rq");
+        Query q = QueryFactory.read("yago_queries/q8.rq");
         qg = new QueryGraph(q);
         RDFGraph.withDefaultMappings(qg);
     }

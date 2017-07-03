@@ -9,8 +9,6 @@ import org.apache.jena.sparql.syntax.ElementTriplesBlock;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.jena.vocabulary.OWLResults.system;
-
 
 /**
  * Created by xgfd on 15/05/2017.

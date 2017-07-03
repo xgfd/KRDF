@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -15,6 +16,7 @@ import java.util.*;
  */
 public class Presto {
     static final Map<String, List<String>> params = new HashMap<>();
+    static boolean verbose = false;
 
     static public void main(String[] args) {
         // -m path to an RDF file
@@ -27,7 +29,7 @@ public class Presto {
                 folderPaths = params.getOrDefault("f", new ArrayList<>()),
                 model = params.getOrDefault("m", new ArrayList<>());
 
-        boolean verbose = params.get("v") != null;
+        verbose = params.get("v") != null;
 
         if (verbose) {
             RDFGraph.debug = true;
@@ -48,26 +50,46 @@ public class Presto {
             return;
         }
 
+        if (verbose) {
+            System.out.println("Initialising RDF model...");
+        }
         RDFGraph.initRDF(model.get(0));
 
+        if (verbose) {
+            System.out.println("Initialising Mathematica...");
+        }
+        M.init();
+
+
+        System.out.printf("%-40s %-15s %-15s %-15s %-15s%n", "Query", "CI90", "Cache_Hit", "Cache_Miss", "Cache_Size");
+
         filePaths.stream()
-                .map(path -> QueryFactory.read(path)) // file path to query
-                .map(query -> esti(query)) // to credible intervals int[]
-                .map(Arrays::toString) // prepare for printing
+                .map(pathStr -> Paths.get(pathStr))
+                .map(path -> collectOutput(path)) // file path to query
                 .forEach(System.out::println);
 
         for (String folderPath : folderPaths) {
             try {
                 Files.walk(Paths.get(folderPath))
                         .filter(Files::isRegularFile)
-                        .map(path -> QueryFactory.read(path.toString()))
-                        .map(query -> esti(query))
-                        .map(Arrays::toString)
+                        .map(path -> collectOutput(path))
                         .forEach(System.out::println);
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
         }
+    }
+
+    static private List<String> collectOutput(Path path) {
+        List<String> output = new ArrayList<>();
+        Query q = QueryFactory.read(path.toString());
+        int[] interval = esti(q);
+        output.add(path.getFileName().toString()); // query file name
+        output.add(Arrays.toString(interval)); // query ci90
+        output.add("" + Cardinality.cacheHit); // cache hit
+        output.add("" + Cardinality.cacheMiss); // cache miss
+        output.add("" + Cardinality.cacheSize()); // cache size
+        return output;
     }
 
     /**
@@ -78,6 +100,11 @@ public class Presto {
      */
     @Nullable
     static private int[] esti(Query q) {
+
+        if (verbose) {
+            System.out.println("Processing query:");
+            System.out.println(q);
+        }
 
         QueryGraph qg = new QueryGraph(q);
         Set<Node> concreteNodes = qg.getConcreteNodes();

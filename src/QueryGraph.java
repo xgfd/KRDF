@@ -89,7 +89,7 @@ class QueryGraph {
                     bgp = (ElementPathBlock) e;
                     bgpCount++;
                     if (bgpCount > 1) {
-                        throw new IllegalArgumentException("Only support queries with a single BGP");
+                        throw new IllegalArgumentException("Only support yago_queries with a single BGP");
                     }
                 }
             }
