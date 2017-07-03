@@ -14,8 +14,30 @@ public class M {
 
     static private KernelLink ml;
 
-    public static void init(String linkname) {
+    public static void init() {
 
+        String linkname;
+
+
+        String os = System.getProperty("os.name").toLowerCase();
+
+        if (os.contains("mac")) {
+            // Typical launch on Mac OS X:
+            linkname = "\"/Applications/Mathematica.app/Contents/MacOS/MathKernel\" -mathlink";
+        } else if (os.contains("windows")) {
+            // Typical launch on Windows:
+            linkname = "c:\\program files\\wolfram research\\mathematica\\10.0\\mathkernel";
+        } else if (os.contains("linux")) {
+            // Typical launch on Linux:
+            linkname = "math -mathlink";
+        } else {
+            throw new RuntimeException("OS not recognised");
+        }
+
+        init(linkname);
+    }
+
+    public static void init(String linkname) {
         String[] argv = {"-linkmode", "launch", "-linkname", linkname};
 
         try {

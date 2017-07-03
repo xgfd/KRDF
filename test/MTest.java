@@ -12,16 +12,7 @@ public class MTest {
 
     @Before
     public void setUp() throws Exception {
-        // Typical launch on Windows:
-//        String linkname = "c:\\program files\\wolfram research\\mathematica\\10.0\\mathkernel";
-
-// Typical launch on Linux:
-//        String linkname = "math -mathlink";
-
-// Typical launch on Mac OS X:
-        String linkname = "\"/Applications/Mathematica.app/Contents/MacOS/MathKernel\" -mathlink";
-
-        M.init(linkname);
+        M.init();
     }
 
     @After
