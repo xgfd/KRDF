@@ -1,12 +1,5 @@
-PREFIX rdf:	<http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX xsd: <http://www.w4.org/2001/XMLSchema#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX dbo: <http://dbpedia.org/ontology/>
-SELECT *
-WHERE {
-        ?subOfAthlete rdfs:subClassOf ?Athlete .
-        ?subOfAthlete rdfs:label ?athleteGroup .
-        ?athlete a ?subOfAthlete .
-        ?athlete dbo:birthDate ?birth .
-        ?athlete dbo:deathDate ?death .
-}
+base <http://mpii.de/yago/resource/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix yago: <http://mpii.de/yago/resource/>
+
+select * where { ?s <bornIn> ?l. ?s rdfs:label ?n. ?s a ?c. }

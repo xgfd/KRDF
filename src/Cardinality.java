@@ -12,6 +12,7 @@ import java.util.*;
  */
 public class Cardinality {
     static private DoubleKeyHashMap<Node, ELT, Integer> cache = new DoubleKeyHashMap<>();
+    static private DoubleKeyHashMap<Node, DiPredicate, List<Node>> neighbourCache = new DoubleKeyHashMap<>();
     static int cacheHit = 0;
     static int cacheMiss = 0;
 
@@ -153,9 +154,15 @@ public class Cardinality {
      */
     static private List<Node> adjacentVertices(Node v, DiPredicate p) {
         assert v.isConcrete();
+        List<Node> adjV = neighbourCache.get(v, p);
 
-        Triple t = p.isIncoming() ? Triple.create(Var.alloc(neighbourVar), p, v) : Triple.create(v, p, Var.alloc(neighbourVar));
-        return getNeighbourVal(RDFGraph.execTriple(t));
+        if (adjV == null) {
+            Triple t = p.isIncoming() ? Triple.create(Var.alloc(neighbourVar), p, v) : Triple.create(v, p, Var.alloc(neighbourVar));
+            adjV = getNeighbourVal(RDFGraph.execTriple(t));
+            neighbourCache.put(v, p, adjV);
+        }
+
+        return adjV;
     }
 
     static private List<Node> getNeighbourVal(List<QuerySolution> rs) {

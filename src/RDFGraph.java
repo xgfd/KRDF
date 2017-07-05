@@ -1,4 +1,3 @@
-import org.apache.jena.graph.Node;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
@@ -38,7 +37,7 @@ public class RDFGraph {
 
     static public List<QuerySolution> execTriple(Triple t) {
         if (debug) {
-            System.out.println(t);
+            System.out.println(t.toString(RDFGraph.getPrefixMapping()));
         }
         return execSelect(buildQuery(t));
     }
@@ -51,6 +50,7 @@ public class RDFGraph {
         QueryExecution qex;
         if (isRemote()) {
             qex = QueryExecutionFactory.sparqlService(remoteSPARQL, q);
+            qex.setTimeout(2000, 5000); // set http read timeout and connect timeout
         } else {
             qex = QueryExecutionFactory.create(q, model);
         }

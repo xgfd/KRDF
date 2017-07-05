@@ -1,0 +1,5 @@
+base <http://mpii.de/yago/resource/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix yago: <http://mpii.de/yago/resource/>
+
+select * where { ?s <bornIn> <Pont-Audemer>. ?s rdfs:label ?n. ?s a <wikicategory_Eritrean_politicians>. }

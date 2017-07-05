@@ -25,6 +25,7 @@ class QueryGraph {
 
     QueryGraph(Query query) {
         init(query);
+        RDFGraph.withDefaultMappings(this);
     }
 
     QueryGraph(ElementPathBlock bgp) {

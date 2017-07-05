@@ -15,7 +15,7 @@ public class CardinalityTest {
     @Before
     public void setUp() throws Exception {
         System.out.println("Loading RDF ...");
-        RDFGraph.initRDF("./athlete.ttl");
+        RDFGraph.initRDF("./yago_data/yago.ttl");
         System.out.println(RDFGraph.size() + " statements loaded.");
     }
 
@@ -43,8 +43,8 @@ public class CardinalityTest {
 
         int card = Cardinality.cardinality(v, elt), total = Cardinality.cardinality(elt);
 
-        System.out.printf("%-40s %-15s %-15s %-15s %-15s %-15s%n", "Node", "Node_Card.", "Total_Card.", "Cache_Hit", "Cache_Miss", "Cache_Size");
-        System.out.printf("%-40s %-15d %-15d %-15d %-15d %-15d%n", v.toString(RDFGraph.getPrefixMapping()), card, total, Cardinality.cacheHit, Cardinality.cacheMiss, Cardinality.cacheSize());
+        System.out.printf("%-40s %-15s %-15s %-15s %-15s%n", "Node", "Node_Card.", "Total_Card.", "Cache_Hit", "Cache_Miss");
+        System.out.printf("%-40s %-15d %-15d %-15d %-15d%n", v.toString(RDFGraph.getPrefixMapping()), card, total, Cardinality.cacheHit, Cardinality.cacheMiss);
 
         assert ref_card == card;
         assert ref_total == total;

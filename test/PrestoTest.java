@@ -6,7 +6,9 @@ import org.junit.Test;
 public class PrestoTest {
     @Test
     public void main() throws Exception {
-        String[] args = {"-m", "http://spr-001.ecs.soton.ac.uk:8890/sparql", "-f", "test/yago_queries", "-v"};
+        String[] args = {"-m", "test/yago_data/yago.ttl", "-f", "test/yago_queries"
+//                , "-v"
+        };
 
         Presto.main(args);
     }

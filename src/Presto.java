@@ -60,8 +60,7 @@ public class Presto {
         }
         M.init();
 
-
-        System.out.printf("%-40s %-15s %-15s %-15s %-15s%n", "Query", "CI90", "Cache_Hit", "Cache_Miss", "Cache_Size");
+        System.out.printf("%s, %s, %s, %s, %s, %s%n", "Query", "CI90", "Cardinality", "Cache_Hit", "Cache_Miss/Size", "Card_per_Node");
 
         filePaths.stream()
                 .map(pathStr -> Paths.get(pathStr))
@@ -83,23 +82,28 @@ public class Presto {
     static private List<String> collectOutput(Path path) {
         List<String> output = new ArrayList<>();
         Query q = QueryFactory.read(path.toString());
-        int[] interval = esti(q);
+
+        Map<Node, Integer> nodeCard = new HashMap<>();
+        int[] interval = esti(q, nodeCard);
+        int true_card = RDFGraph.execSelect(q).size();
         output.add(path.getFileName().toString()); // query file name
         output.add(Arrays.toString(interval)); // query ci90
+        output.add("" + true_card); // true cardinality
         output.add("" + Cardinality.cacheHit); // cache hit
-        output.add("" + Cardinality.cacheMiss); // cache miss
-        output.add("" + Cardinality.cacheSize()); // cache size
+        output.add("" + Cardinality.cacheSize()); // cache size == cache miss
+        output.add(nodeCard.toString());
         return output;
     }
 
     /**
      * Calculate the 90% credible interval of the cardinality of a query
      *
-     * @param q
+     * @param q      A query
+     * @param output A hash map to collect intermediate stats
      * @return Cardinality credible interval
      */
     @Nullable
-    static private int[] esti(Query q) {
+    static private int[] esti(Query q, Map<Node, Integer> output) {
 
         if (verbose) {
             System.out.println("Processing query:");
@@ -114,6 +118,7 @@ public class Presto {
                 .mapToInt(v -> {
                     ELT elt = qg.asELT(v);
                     int card = Cardinality.cardinality(v, elt);
+                    output.put(v, card);
                     return card;
                 })
                 .toArray();
@@ -122,14 +127,26 @@ public class Presto {
         int total = Cardinality.cardinality(qg);
 
         int[] interval = null;
-        try {
-            // calculate 90% credible interval
-            interval = M.ci90(total, cardinalities);
-        } catch (MathLinkException e) {
-            System.out.println(e.getMessage());
-        } catch (ExprFormatException e) {
-            System.out.println(e.getMessage());
+
+        switch (concreteNodes.size()) {
+            case 0:
+                interval = new int[]{total};
+                break;
+            case 1:
+                interval = cardinalities;
+                break;
+            default: // more than 1 bound obj/sub
+                try {
+                    // calculate 90% credible interval
+                    interval = M.ci90(total, cardinalities);
+                } catch (MathLinkException e) {
+                    System.out.println(e.getMessage());
+                } catch (ExprFormatException e) {
+                    System.out.println(e.getMessage());
+                }
+                break;
         }
+
         return interval;
     }
 
