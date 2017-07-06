@@ -1,3 +1,4 @@
+import org.apache.jena.base.Sys;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.Model;
@@ -43,20 +44,20 @@ public class RDFGraph {
     }
 
     static public List<QuerySolution> execSelect(Query q) {
-        if (debug) {
-//            System.out.println(q);
-        }
 
         QueryExecution qex;
+
         if (isRemote()) {
             qex = QueryExecutionFactory.sparqlService(remoteSPARQL, q);
-            qex.setTimeout(2000, 5000); // set http read timeout and connect timeout
         } else {
             qex = QueryExecutionFactory.create(q, model);
         }
 
+//        qex.setTimeout(2000, 5000); // set http read timeout and connect timeout
+
         List<QuerySolution> results = materilise(qex.execSelect());
         qex.close(); // remote endpoints may limit the number of connections and cause further execution to hang
+
         return results;
     }
 

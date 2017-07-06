@@ -23,6 +23,7 @@ public class Presto {
         // -q path to query file
         // -f path to query file folder
         // -v verbose output
+        // -V include intermediate query output
         parseParams(args);
 
         List<String> filePaths = params.getOrDefault("q", new ArrayList<>()),
@@ -31,7 +32,7 @@ public class Presto {
 
         verbose = params.get("v") != null;
 
-        if (verbose) {
+        if (params.get("V") != null) {
             RDFGraph.debug = true;
         }
 
