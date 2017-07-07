@@ -1,9 +1,10 @@
 import com.wolfram.jlink.ExprFormatException;
 import com.wolfram.jlink.MathLinkException;
+import org.apache.jena.ext.com.google.common.primitives.Doubles;
+import org.apache.jena.ext.com.google.common.primitives.Ints;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -85,7 +86,7 @@ public class Presto {
         Query q = QueryFactory.read(path.toString());
 
         Map<Node, Integer> nodeCard = new HashMap<>();
-        int[] interval = esti(q, nodeCard);
+        double[] interval = esti(q, nodeCard);
         int true_card = RDFGraph.execSelect(q).size();
         output.add(path.getFileName().toString()); // query file name
         output.add(Arrays.toString(interval)); // query cr90
@@ -103,8 +104,7 @@ public class Presto {
      * @param output A hash map to collect intermediate stats
      * @return Cardinality credible interval
      */
-    @Nullable
-    static private int[] esti(Query q, Map<Node, Integer> output) {
+    static private double[] esti(Query q, Map<Node, Integer> output) {
 
         if (verbose) {
             System.out.println("Processing query:");
@@ -127,19 +127,22 @@ public class Presto {
         // calculate the total cardinality
         int total = Cardinality.cardinality(qg);
 
-        int[] interval = null;
+        double[] interval = null;
+        double card;
 
         switch (concreteNodes.size()) {
             case 0:
-                interval = new int[]{total};
+                interval = new double[]{total};
                 break;
             case 1:
-                interval = cardinalities;
+                interval = Doubles.toArray(Ints.asList(cardinalities));
                 break;
             default: // more than 1 bound obj/sub
                 try {
                     // calculate 90% credible interval
-                    interval = M.cr90(total, cardinalities);
+//                    interval = M.cr90(total, cardinalities);
+                    card = M.maxProbArg(total, cardinalities);
+                    interval = new double[]{card};
                 } catch (MathLinkException e) {
                     System.out.println(e.getMessage());
                 } catch (ExprFormatException e) {

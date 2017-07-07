@@ -79,19 +79,19 @@ public class M {
     }
 
     /**
-     * Given a 2-column matrix as below
+     * Given a 2-column binary matrix with evenly distributed 1s in each column, as below
      * 1 0
      * 1 1
      * 0 1
      * 0 1
      * 0 0
-     * calculate the probability that a certain number of rows have all 1s.
+     * this function is the mass density function of that a certain number of rows have all 1s.
      *
      * @param t Total number of rows
-     * @param a The sum of the 1st column (number of 1s)
-     * @param b The sum of the 2nd column
-     * @param r The number of rows having all 1s.
-     * @return A probability that with a 1s in one column and b 1s in another, r rows having all 1s will be produced.
+     * @param a The number of evenly distributed 1s in the 1st column
+     * @param b The number of evenly distributed 1s in the 2nd column
+     * @param r The number of rows having all 1s
+     * @return A probability of {@code r} rows having all 1s
      */
     static public Expr mdf2(int t, int a, int b, int r) throws MathLinkException {
         ml.newPacket();
@@ -108,6 +108,16 @@ public class M {
         return result;
     }
 
+    /**
+     * A generalisation of mdf2 to n-column matrix.
+     *
+     * @param t       Total number of rows
+     * @param columns An array of the sum of each column
+     * @param r       The number of rows having all 1s
+     * @return A probability of {@code r} rows having all 1s
+     * @throws MathLinkException
+     */
+
     static public Expr mdf(int t, int[] columns, int r) throws MathLinkException {
         ml.newPacket();
         ml.putFunction("EvaluatePacket", 1);
@@ -122,6 +132,16 @@ public class M {
         return result;
     }
 
+    /**
+     * Calculate the 90% credible interval of the mdf defined above.
+     *
+     * @param t
+     * @param columns
+     * @return A 90% credible interval
+     * @throws MathLinkException
+     * @throws ExprFormatException
+     * @see #mdf(int, int[], int)
+     */
     static public int[] cr90(int t, int[] columns) throws MathLinkException, ExprFormatException {
         ml.newPacket();
         ml.putFunction("EvaluatePacket", 1);
@@ -133,5 +153,27 @@ public class M {
         Expr result = ml.getExpr();
         assert result.listQ();
         return (int[]) result.asArray(Expr.INTEGER, 1);
+    }
+
+
+    /**
+     * Find the argument that maximise the probability w.r.t the mdf defined above.
+     *
+     * @param t
+     * @param columns
+     * @return
+     * @see #mdf(int, int[], int)
+     */
+    static public double maxProbArg(int t, int[] columns) throws MathLinkException, ExprFormatException {
+        ml.newPacket();
+        ml.putFunction("EvaluatePacket", 1);
+        ml.putFunction("maxProbArg", 2);
+        ml.put(t);
+        ml.put(columns);
+        ml.endPacket();
+        ml.waitForAnswer();
+        Expr result = ml.getExpr();
+//        assert result.();
+        return result.asDouble();
     }
 }
