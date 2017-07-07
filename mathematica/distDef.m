@@ -62,7 +62,7 @@ dist2[t_, a_, c_] := ProbabilityDistribution[mdf2[t, a, c, r], {r, Max[a + c - t
 dist[t_, c_]:=ProbabilityDistribution[mdf[t, c, r], {r, bottom[c,t], top[c], 1}];
 
 (*calculate the 90% crediable interval*)
-ci90[t_,c_]:=Quantile[dist[t,c],{0.05,0.95}];
+cr90[t_,c_]:=Quantile[dist[t,c],{0.05,0.95}];
 discArgMax[t_,c_]:=With[{
 (*generate args*)
 args=Range[bottom[c,t],top[c]]},

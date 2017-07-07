@@ -88,7 +88,7 @@ public class Presto {
         int[] interval = esti(q, nodeCard);
         int true_card = RDFGraph.execSelect(q).size();
         output.add(path.getFileName().toString()); // query file name
-        output.add(Arrays.toString(interval)); // query ci90
+        output.add(Arrays.toString(interval)); // query cr90
         output.add("" + true_card); // true cardinality
         output.add("" + Cardinality.cacheHit); // cache hit
         output.add("" + Cardinality.cacheSize()); // cache size == cache miss
@@ -139,7 +139,7 @@ public class Presto {
             default: // more than 1 bound obj/sub
                 try {
                     // calculate 90% credible interval
-                    interval = M.ci90(total, cardinalities);
+                    interval = M.cr90(total, cardinalities);
                 } catch (MathLinkException e) {
                     System.out.println(e.getMessage());
                 } catch (ExprFormatException e) {

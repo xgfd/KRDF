@@ -122,10 +122,10 @@ public class M {
         return result;
     }
 
-    static public int[] ci90(int t, int[] columns) throws MathLinkException, ExprFormatException {
+    static public int[] cr90(int t, int[] columns) throws MathLinkException, ExprFormatException {
         ml.newPacket();
         ml.putFunction("EvaluatePacket", 1);
-        ml.putFunction("ci90", 2);
+        ml.putFunction("cr90", 2);
         ml.put(t);
         ml.put(columns);
         ml.endPacket();

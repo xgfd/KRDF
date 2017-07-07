@@ -1,4 +1,3 @@
-import com.wolfram.jlink.Expr;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +32,6 @@ public class MTest {
     public void ci90() throws Exception {
         int t = 10, a = 2, b = 3;
         int[] columns = {a, b};
-        System.out.println(Arrays.toString(M.ci90(t, columns)));
+        System.out.println(Arrays.toString(M.cr90(t, columns)));
     }
 }
