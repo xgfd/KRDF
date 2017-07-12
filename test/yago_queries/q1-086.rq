@@ -1,0 +1,6 @@
+base <http://mpii.de/yago/resource/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix yago: <http://mpii.de/yago/resource/>
+
+select * where { ?s <bornIn> <http://mpii.de/yago/resource/Tampico,_Illinois>. ?s rdfs:label ?n. ?s a <http://mpii.de/yago/resource/wikicategory_Companions_of_the_Distinguished_Service_Order>. }
+

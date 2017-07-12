@@ -1,0 +1,6 @@
+base <http://mpii.de/yago/resource/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix yago: <http://mpii.de/yago/resource/>
+
+select * where { ?s <bornIn> <http://mpii.de/yago/resource/Darmstadt>. ?s rdfs:label ?n. ?s a <http://mpii.de/yago/resource/wikicategory_Scholars_and_leaders_of_nonviolence,_or_nonviolent_resistance>. }
+

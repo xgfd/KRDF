@@ -1,0 +1,5 @@
+base <http://mpii.de/yago/resource/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix yago: <http://mpii.de/yago/resource/>
+
+select * where { ?s <bornIn> $1. ?s rdfs:label ?n. ?s a $2. }

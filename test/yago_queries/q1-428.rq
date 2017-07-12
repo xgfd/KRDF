@@ -1,0 +1,6 @@
+base <http://mpii.de/yago/resource/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix yago: <http://mpii.de/yago/resource/>
+
+select * where { ?s <bornIn> <http://mpii.de/yago/resource/North_Bend,_Ohio>. ?s rdfs:label ?n. ?s a <http://mpii.de/yago/resource/wikicategory_Computer_designers>. }
+
