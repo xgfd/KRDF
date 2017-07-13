@@ -12,7 +12,7 @@ import java.util.*;
  */
 public class Cardinality {
     static private DoubleKeyHashMap<Node, ELT, Integer> cache = new DoubleKeyHashMap<>();
-    static private DoubleKeyHashMap<Node, DiPredicate, List<Node>> neighbourCache = new DoubleKeyHashMap<>();
+    static private DoubleKeyHashMap<Node, DiPredicate, List<Node>> neighbourCache = new DoubleKeyHashMap<>(100000, 0.4f);
     static int cacheHit = 0;
     static int cacheMiss = 0;
 
@@ -128,12 +128,6 @@ public class Cardinality {
      * @return
      */
     static private int cardinality(Node v, DiPredicate p, ELT queryGraph) {
-//        int card = 0;
-//        for (Node n : adjacentVertices(v, p)) {
-//            card += cardinality(n, descendantTree(p, queryGraph));
-//        }
-//
-//        return card;
         return adjacentVertices(v, p).stream() // get neighbours
                 .mapToInt(n -> cardinality(n, descendantTree(p, queryGraph))) // map to neighbour's cardinality
                 .sum();
@@ -154,7 +148,8 @@ public class Cardinality {
      */
     static private List<Node> adjacentVertices(Node v, DiPredicate p) {
         assert v.isConcrete();
-        List<Node> adjV = neighbourCache.get(v, p);
+        List<Node> adjV;
+        adjV = neighbourCache.get(v, p);
 
         if (adjV == null) {
             Triple t = p.isIncoming() ? Triple.create(Var.alloc(neighbourVar), p, v) : Triple.create(v, p, Var.alloc(neighbourVar));

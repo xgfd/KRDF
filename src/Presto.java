@@ -62,7 +62,7 @@ public class Presto {
         }
         M.init();
 
-        System.out.printf("%s, %s, %s, %s, %s, %s%n", "Query", "CI90", "Cardinality", "Cache_Hit", "Cache_Miss/Size", "Card_per_Node");
+        System.out.printf("%s,%s,%s,%s,%s,%s%n", "Query", "CI90", "Cardinality", "Cache_Hit", "Cache_Miss/Size", "Card_per_Node");
 
         filePaths.stream()
                 .map(pathStr -> Paths.get(pathStr))
