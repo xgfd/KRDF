@@ -1,5 +1,0 @@
-base <http://mpii.de/yago/resource/>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix yago: <http://mpii.de/yago/resource/>
-
-select ?s ?u ?c ?m where { ?s <hasOfficialLanguage> <Russian_language>. ?s <hasUTCOffset> ?u. ?s <hasCapital> ?c. ?s <hasCurrency> <Russian_ruble> }

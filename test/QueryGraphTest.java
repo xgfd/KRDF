@@ -16,7 +16,7 @@ public class QueryGraphTest {
 
     @Before
     public void setUp() throws Exception {
-        Query q = QueryFactory.read("yago_queries/q8.rq");
+        Query q = QueryFactory.read("test/yago_queries/q1-001.rq");
         qg = new QueryGraph(q);
     }
 

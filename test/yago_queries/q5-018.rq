@@ -1,0 +1,6 @@
+base <http://mpii.de/yago/resource/>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix yago: <http://mpii.de/yago/resource/>
+
+select * where { ?s <diedIn> <http://mpii.de/yago/resource/Philadelphia>. ?s rdfs:label ?n. ?s <diedOnDate> ?d. ?s a <http://mpii.de/yago/resource/wikicategory_19th_century_mathematicians> }
+

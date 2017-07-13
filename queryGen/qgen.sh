@@ -1,4 +1,5 @@
 # arr1 arr2 template.rq
+#sh qGen.sh q1_1.txt q1_2.txt q1.rq
 declare -a arr1
 declare -a arr2
 
