@@ -62,7 +62,7 @@ public class Presto {
         }
         M.init();
 
-        System.out.printf("%s,%s,%s,%s,%s,%s%n", "Query", "CI90", "Cardinality", "Cache_Hit", "Cache_Miss/Size", "Card_per_Node");
+        System.out.printf("%s,%s,%s,%s,%s,%s,%s%n", "Query", "CI90", "Cardinality", "Cache_Hit", "Cache_Miss", "Cache_Size", "Card_per_Node");
 
         filePaths.stream()
                 .map(pathStr -> Paths.get(pathStr))
@@ -92,7 +92,8 @@ public class Presto {
         output.add(Arrays.toString(interval)); // query cr90
         output.add("" + true_card); // true cardinality
         output.add("" + Cardinality.cacheHit); // cache hit
-        output.add("" + Cardinality.cacheSize()); // cache size == cache miss
+        output.add("" + Cardinality.cacheMiss); // cache miss
+        output.add("" + Cardinality.cacheSize()); // cache size
         output.add(nodeCard.toString());
         return output;
     }
