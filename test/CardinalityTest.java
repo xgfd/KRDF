@@ -1,3 +1,4 @@
+import org.apache.jena.base.Sys;
 import org.apache.jena.graph.Node;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
@@ -41,7 +42,13 @@ public class CardinalityTest {
 
         ELT elt = qg.asELT(v);
 
+        Cardinality.adjVTime = 0;
+
+        long ts = System.currentTimeMillis();
         int card = Cardinality.cardinality(v, elt), total = Cardinality.cardinality(elt);
+        ts = System.currentTimeMillis() - ts;
+
+        System.out.println("Total time: " + ts + "; adjV: " + Cardinality.adjVTime);
 
         System.out.printf("%-40s %-15s %-15s %-15s %-15s%n", "Node", "Node_Card.", "Total_Card.", "Cache_Hit", "Cache_Miss");
         System.out.printf("%-40s %-15d %-15d %-15d %-15d%n", v.toString(RDFGraph.getPrefixMapping()), card, total, Cardinality.cacheHit, Cardinality.cacheMiss);

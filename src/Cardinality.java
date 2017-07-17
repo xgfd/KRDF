@@ -141,12 +141,15 @@ public class Cardinality {
         return tree.getChild(p);
     }
 
+    static public long adjVTime = 0;
+
     /**
      * @param v A concrete node
      * @param p A predicate as an edge
      * @return Neighbours of {@code v} via {@code edge}
      */
     static private List<Node> adjacentVertices(Node v, DiPredicate p) {
+        long ts = System.currentTimeMillis();
         assert v.isConcrete();
         List<Node> adjV;
         adjV = neighbourCache.get(v, p);
@@ -156,6 +159,8 @@ public class Cardinality {
             adjV = getNeighbourVal(RDFGraph.execTriple(t));
             neighbourCache.put(v, p, adjV);
         }
+
+        adjVTime += System.currentTimeMillis() - ts;
 
         return adjV;
     }
