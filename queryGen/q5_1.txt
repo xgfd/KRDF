@@ -1,4 +1,3 @@
-1
 http://mpii.de/yago/resource/London
 http://mpii.de/yago/resource/Paris
 http://mpii.de/yago/resource/Washington,_D.C.

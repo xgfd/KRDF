@@ -1,6 +1,0 @@
-base <http://mpii.de/yago/resource/>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix yago: <http://mpii.de/yago/resource/>
-
-select * where { ?s <originatesFrom> <http://mpii.de/yago/resource/Montgomery,_Alabama>. ?s rdfs:label ?n. ?s <hasWebsite> <http://www.jvrmusic.com/artist/artist-index.asp> }
-

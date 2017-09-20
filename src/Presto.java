@@ -27,8 +27,8 @@ public class Presto {
         // -V include intermediate query output
         parseParams(args);
 
-        List<String> filePaths = params.getOrDefault("q", new ArrayList<>()),
-                folderPaths = params.getOrDefault("f", new ArrayList<>()),
+        List<String> queryPaths = params.getOrDefault("q", new ArrayList<>()),
+                queryFolderPaths = params.getOrDefault("f", new ArrayList<>()),
                 model = params.getOrDefault("m", new ArrayList<>());
 
         verbose = params.get("v") != null;
@@ -37,7 +37,7 @@ public class Presto {
             RDFGraph.debug = true;
         }
 
-        if (filePaths.size() == 0 && folderPaths.size() == 0 && model.size() == 0) {
+        if (queryPaths.size() == 0 && queryFolderPaths.size() == 0 && model.size() == 0) {
             System.out.printf("%s%n%s%n%s%n%s", "Presto -m RDF_file or a SPARQL endpoint [-q query_file query_file... | -f folder folder...]", "-m: path to an RDF file", "-q: paths to query files", "-f: paths to folders of query files (.rq)");
             return;
         }
@@ -47,7 +47,7 @@ public class Presto {
             return;
         }
 
-        if (filePaths.size() == 0 && folderPaths.size() == 0) {
+        if (queryPaths.size() == 0 && queryFolderPaths.size() == 0) {
             System.out.println("Missing query file(s). Use -q for query files separated by spaces or -f for folders of query files.");
             return;
         }
@@ -62,18 +62,18 @@ public class Presto {
         }
         M.init();
 
-        System.out.printf("%s,%s,%s,%s,%s,%s,%s%n", "Query", "CI90", "Cardinality", "Cache_Hit", "Cache_Miss", "Cache_Size", "Card_per_Node");
+        System.out.printf("%s,%s,%s,%s,%s,%s,%s,%s,%s%n", "Query", "CI90", "Cardinality", "Cache_Hit", "Cache_Miss", "Cache_Size", "Card_per_Node", "Card_Cal (ms)", "Prob_Cal (ms)");
 
-        filePaths.stream()
+        queryPaths.stream()
                 .map(pathStr -> Paths.get(pathStr))
                 .map(path -> collectOutput(path)) // file path to query
                 .forEach(System.out::println);
 
-        for (String folderPath : folderPaths) {
+        for (String queryFolder : queryFolderPaths) {
             try {
-                Files.walk(Paths.get(folderPath))
-                        .filter(Files::isRegularFile)
-                        .map(path -> collectOutput(path))
+                Files.walk(Paths.get(queryFolder)) // list files
+                        .filter(p -> p.getFileName().toString().endsWith(".rq")) // get all .rq files
+                        .map(path -> collectOutput(path)) // estimate queries and collect stats
                         .forEach(System.out::println);
             } catch (IOException e) {
                 System.out.println(e.getMessage());
@@ -85,42 +85,46 @@ public class Presto {
         List<String> output = new ArrayList<>();
         Query q = QueryFactory.read(path.toString());
 
-        Map<Node, Integer> nodeCard = new HashMap<>();
-        double[] interval = esti(q, nodeCard);
+        List internal = esti(q);
         int true_card = RDFGraph.execSelect(q).size();
         output.add(path.getFileName().toString()); // query file name
-        output.add(Arrays.toString(interval)); // query cr90
+        output.add(internal.get(0).toString()); // most likely card.
         output.add("" + true_card); // true cardinality
         output.add("" + Cardinality.cacheHit); // cache hit
         output.add("" + Cardinality.cacheMiss); // cache miss
         output.add("" + Cardinality.cacheSize()); // cache size
-        output.add(nodeCard.toString());
+        output.add(internal.get(1).toString()); // card. per node
+        output.add(internal.get(2).toString()); // card. calculation time
+        output.add(internal.get(3).toString()); // probability calculation time
         return output;
     }
 
     /**
      * Calculate the 90% credible interval of the cardinality of a query
      *
-     * @param q      A query
-     * @param output A hash map to collect intermediate stats
-     * @return Cardinality credible interval
+     * @param q A query
+     * @return A list of internal stats, i.e., [double most_likely_card, Map<Node, Integer> nodeCard, long card_time, long prob_time]
      */
-    static private double[] esti(Query q, Map<Node, Integer> output) {
+    static private List esti(Query q) {
 
         if (verbose) {
             System.out.println("Processing query:");
             System.out.println(q);
         }
 
+        List interStats = new ArrayList();
+        Map<Node, Integer> nodeCard = new HashMap<>();
+        long card_time, prob_time = 0;
         QueryGraph qg = new QueryGraph(q);
         Set<Node> concreteNodes = qg.getConcreteNodes();
 
         // calculate cardinality of every concrete node
+        card_time = System.currentTimeMillis();
         int[] cardinalities = concreteNodes.stream()
                 .mapToInt(v -> {
                     ELT elt = qg.asELT(v);
                     int card = Cardinality.cardinality(v, elt);
-                    output.put(v, card);
+                    nodeCard.put(v, card);
                     return card;
                 })
                 .toArray();
@@ -128,22 +132,28 @@ public class Presto {
         // calculate the total cardinality
         int total = Cardinality.cardinality(qg);
 
-        double[] interval = null;
-        double card;
+        card_time = System.currentTimeMillis() - card_time;
+
+//        double[] interval = null;
+        double card = -1;
 
         switch (concreteNodes.size()) {
             case 0:
-                interval = new double[]{total};
+                card = total;
                 break;
             case 1:
-                interval = Doubles.toArray(Ints.asList(cardinalities));
+                card = cardinalities[0];
                 break;
             default: // more than 1 bound obj/sub
                 try {
                     // calculate 90% credible interval
 //                    interval = M.cr90(total, cardinalities);
+
+                    prob_time = System.currentTimeMillis();
                     card = M.maxProbArg(total, cardinalities);
-                    interval = new double[]{card};
+                    prob_time = System.currentTimeMillis() - prob_time;
+
+//                    interval = new double[]{card};
                 } catch (MathLinkException e) {
                     System.out.println(e.getMessage());
                 } catch (ExprFormatException e) {
@@ -152,7 +162,12 @@ public class Presto {
                 break;
         }
 
-        return interval;
+        interStats.add(card);
+        interStats.add(nodeCard);
+        interStats.add(card_time);
+        interStats.add(prob_time);
+
+        return interStats;
     }
 
     static private void parseParams(String[] args) {

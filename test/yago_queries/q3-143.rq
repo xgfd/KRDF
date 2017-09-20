@@ -1,6 +1,0 @@
-base <http://mpii.de/yago/resource/>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix yago: <http://mpii.de/yago/resource/>
-
-select * where { ?s <originatesFrom> <http://mpii.de/yago/resource/Whittier,_California>. ?s rdfs:label ?n. ?s <hasWebsite> <http://www.herbalpert.com> }
-
