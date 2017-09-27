@@ -1,7 +1,11 @@
-PREFIX yago: <http://mpii.de/yago/resource/>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  yago: <http://mpii.de/yago/resource/>
+PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-SELECT *
-{
-    ?person yago:discovered/yago:influences/yago:discovered/yago:influences/yago:bornOnDate ?date.
-}
+SELECT  *
+WHERE
+  { ?person   yago:discovered  ?discovery .
+    ?discovery  yago:influences  ?p .
+    ?p        yago:discovered  ?discovery2 .
+    ?discovery2  yago:influences  ?p2 .
+    ?p2       yago:bornOnDate  ?date
+  }

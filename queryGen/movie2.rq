@@ -1,9 +1,11 @@
-PREFIX yago: <http://mpii.de/yago/resource/>
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  yago: <http://mpii.de/yago/resource/>
+PREFIX  rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-SELECT *
-{
-  ?director yago:produced/yago:isOfGenre/rdfs:label ?label;
-
-            yago:influences ?person.
-}
+SELECT  *
+WHERE
+  { ?director  yago:produced   ?movie .
+    ?movie    yago:isOfGenre   ?genre .
+    ?genre    rdfs:label       ?label .
+    ?director  yago:influences  ?person
+  }
