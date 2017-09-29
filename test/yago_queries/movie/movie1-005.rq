@@ -1,0 +1,16 @@
+PREFIX yago: <http://mpii.de/yago/resource/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT *
+WHERE
+{ ?director yago:directed <http://mpii.de/yago/resource/Hannibal_(film)> .
+<http://mpii.de/yago/resource/Hannibal_(film)> yago:hasPredecessor ?pre .
+?pre yago:hasPredecessor ?ppre .
+?ppre rdf:type <http://mpii.de/yago/resource/wordnet_album_106591815> .
+?director yago:produced ?otherM .
+?otherM yago:isOfGenre ?genre .
+?genre rdfs:label ?label .
+?director yago:influences <http://mpii.de/yago/resource/Richard_Bennett_Lamas>
+}
+

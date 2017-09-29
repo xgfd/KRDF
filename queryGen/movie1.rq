@@ -4,12 +4,12 @@ PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
 SELECT  *
 WHERE
-  { ?director  yago:directed       ?movie .
-    ?movie    yago:hasPredecessor  ?pre .
+  { ?director  yago:directed       $1 .
+    $1        yago:hasPredecessor  ?pre .
     ?pre      yago:hasPredecessor  ?ppre .
-    ?ppre     rdf:type             ?preType .
+    ?ppre     rdf:type             $2 .
     ?director  yago:produced       ?otherM .
     ?otherM   yago:isOfGenre       ?genre .
     ?genre    rdfs:label           ?label .
-    ?director  yago:influences     ?person
+    ?director  yago:influences     $3
   }

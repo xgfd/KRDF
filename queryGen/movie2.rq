@@ -4,8 +4,8 @@ PREFIX  rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
 SELECT  *
 WHERE
-  { ?director  yago:produced   ?movie .
+  { $2  yago:produced   ?movie .
     ?movie    yago:isOfGenre   ?genre .
     ?genre    rdfs:label       ?label .
-    ?director  yago:influences  ?person
+    $2  yago:influences $1
   }

@@ -1,0 +1,12 @@
+PREFIX yago: <http://mpii.de/yago/resource/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT *
+WHERE
+{ <http://mpii.de/yago/resource/Billy_Joel> yago:produced ?movie .
+?movie yago:isOfGenre ?genre .
+?genre rdfs:label ?label .
+<http://mpii.de/yago/resource/Billy_Joel> yago:influences <http://mpii.de/yago/resource/Delta_Goodrem>
+}
+

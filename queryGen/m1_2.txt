@@ -1,0 +1,9 @@
+http://mpii.de/yago/resource/wikicategory_American_films
+http://mpii.de/yago/resource/wikicategory_Films_directed_by_Michael_Mann
+http://mpii.de/yago/resource/wordnet_movie_106613686
+http://mpii.de/yago/resource/wikicategory_Serial_killer_films
+http://mpii.de/yago/resource/wordnet_album_106591815
+http://mpii.de/yago/resource/wikicategory_1986_films
+http://mpii.de/yago/resource/wikicategory_Psychological_thriller_films
+http://mpii.de/yago/resource/wikicategory_Crime_thriller_films
+http://mpii.de/yago/resource/wikicategory_Detective_films
