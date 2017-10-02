@@ -1,4 +1,6 @@
+import org.apache.jena.base.Sys;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ResultSet;
@@ -44,7 +46,7 @@ public class Cardinality {
 
     static public int cardinality(ELT elt) {
         DiPredicate p = elt.getDescendantEdges().iterator().next();
-        Triple t = Triple.create(Var.alloc("s"), p, Var.alloc("o"));
+        Triple t = Triple.create(Var.alloc("s"), p.asNode(), Var.alloc("o"));
         List<QuerySolution> rs = RDFGraph.execTriple(t);
 
         Set<Node> roots = new HashSet<>();
@@ -128,7 +130,8 @@ public class Cardinality {
      * @return
      */
     static private int cardinality(Node v, DiPredicate p, ELT queryGraph) {
-        return adjacentVertices(v, p).stream() // get neighbours
+        List<Node> adjV = adjacentVertices(v, p);
+        return adjV.stream() // get neighbours
                 .mapToInt(n -> cardinality(n, descendantTree(p, queryGraph))) // map to neighbour's cardinality
                 .sum();
     }
@@ -140,8 +143,6 @@ public class Cardinality {
     static private ELT descendantTree(DiPredicate p, ELT tree) {
         return tree.getChild(p);
     }
-
-    static public long adjVTime = 0;
 
     /**
      * @param v A concrete node
@@ -155,12 +156,10 @@ public class Cardinality {
         adjV = neighbourCache.get(v, p);
 
         if (adjV == null) {
-            Triple t = p.isIncoming() ? Triple.create(Var.alloc(neighbourVar), p, v) : Triple.create(v, p, Var.alloc(neighbourVar));
+            Triple t = p.isIncoming() ? Triple.create(Var.alloc(neighbourVar), p.asNode(), v) : Triple.create(v, p.asNode(), Var.alloc(neighbourVar));
             adjV = getNeighbourVal(RDFGraph.execTriple(t));
             neighbourCache.put(v, p, adjV);
         }
-
-        adjVTime += System.currentTimeMillis() - ts;
 
         return adjV;
     }

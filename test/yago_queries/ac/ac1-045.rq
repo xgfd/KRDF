@@ -1,0 +1,12 @@
+PREFIX yago: <http://mpii.de/yago/resource/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+SELECT *
+WHERE
+{ <http://mpii.de/yago/resource/Xenocrates> yago:discovered ?discovery .
+?discovery yago:influences ?p .
+?p yago:discovered ?discovery2 .
+?discovery2 yago:influences ?p2 .
+?p2 yago:bornOnDate <http://mpii.de/yago/resource/1805-07-29>
+}
+

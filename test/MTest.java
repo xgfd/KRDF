@@ -26,6 +26,8 @@ public class MTest {
         System.out.println(M.mdf(t, columns, r));
 
         assert M.mdf2(t, a, b, r).equals(M.mdf(t, columns, r));
+
+        System.out.println(M.mdf(t, new int[] {a, b, 4}, r));
     }
 
     @Test
@@ -33,5 +35,13 @@ public class MTest {
         int t = 10, a = 2, b = 3;
         int[] columns = {a, b};
         System.out.println(Arrays.toString(M.cr90(t, columns)));
+    }
+
+    @Test
+    public void maxProbArg() throws Exception {
+        int t = 10, a = 2, b = 3, r = 1;
+
+        System.out.println(M.maxProbArg(t, new int[] {a, b, 4}));
+
     }
 }

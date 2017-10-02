@@ -1,5 +1,15 @@
-base <http://mpii.de/yago/resource/>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix yago: <http://mpii.de/yago/resource/>
+PREFIX yago: <http://mpii.de/yago/resource/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 
-select * where { ?s <bornIn> ?l. ?s rdfs:label ?n. ?s a ?c. }
+SELECT *
+WHERE
+{ ?director yago:directed ?movie .
+?movie yago:hasPredecessor ?pre .
+?pre yago:hasPredecessor ?ppre .
+?ppre rdf:type ?type .
+?director yago:produced ?otherM .
+?otherM yago:isOfGenre ?genre .
+?genre rdfs:label ?label .
+?director yago:influences ?Person
+}

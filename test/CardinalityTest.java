@@ -1,5 +1,6 @@
 import org.apache.jena.base.Sys;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.query.Query;
 import org.apache.jena.query.QueryFactory;
 import org.apache.jena.query.QuerySolution;
@@ -16,7 +17,7 @@ public class CardinalityTest {
     @Before
     public void setUp() throws Exception {
         System.out.println("Loading RDF ...");
-        RDFGraph.initRDF("./yago_data/yago.ttl");
+        RDFGraph.initRDF("./yago_data/movie.ttl");
         System.out.println(RDFGraph.size() + " statements loaded.");
     }
 
@@ -38,35 +39,36 @@ public class CardinalityTest {
 
         QueryGraph qg = new QueryGraph(q);
 
-        Node v = qg.getConcreteNodes().iterator().next();
-
-        ELT elt = qg.asELT(v);
-
-        Cardinality.adjVTime = 0;
-
-        long ts = System.currentTimeMillis();
-        int card = Cardinality.cardinality(v, elt), total = Cardinality.cardinality(elt);
-        ts = System.currentTimeMillis() - ts;
-
-        System.out.println("Total time: " + ts + "; adjV: " + Cardinality.adjVTime);
-
-        System.out.printf("%-40s %-15s %-15s %-15s %-15s%n", "Node", "Node_Card.", "Total_Card.", "Cache_Hit", "Cache_Miss");
-        System.out.printf("%-40s %-15d %-15d %-15d %-15d%n", v.toString(RDFGraph.getPrefixMapping()), card, total, Cardinality.cacheHit, Cardinality.cacheMiss);
-
-        assert ref_card == card;
+//        Node v = NodeFactory.createURI("http://mpii.de/yago/resource/wikicategory_American_films"); //qg.getConcreteNodes().iterator().next();
+//
+//        ELT elt = qg.asELT(v);
+//
+//        Cardinality.adjVTime = 0;
+//
+//        long ts = System.currentTimeMillis();
+//        int card = Cardinality.cardinality(v, elt), total = Cardinality.cardinality(elt);
+//        ts = System.currentTimeMillis() - ts;
+//
+//        System.out.println("Total time: " + ts + "; adjV: " + Cardinality.adjVTime);
+//
+//        System.out.printf("%-40s %-15s %-15s %-15s %-15s%n", "Node", "Node_Card.", "Total_Card.", "Cache_Hit", "Cache_Miss");
+//        System.out.printf("%-40s %-15d %-15d %-15d %-15d%n", v.toString(RDFGraph.getPrefixMapping()), card, total, Cardinality.cacheHit, Cardinality.cacheMiss);
+//
+//        assert ref_card == card;
+        int total = Cardinality.cardinality(qg);
         assert ref_total == total;
 
-//        qg.getConcreteNodes().stream()
-//                .forEach(v -> {
-//                    ELT elt = qg.asELT(v);
-//
-//                    int card = Cardinality.cardinality(v, elt);
-//
-//                    System.out.printf("%-50s %-10d %-10d %-10d%n", v, card, Cardinality.cacheHit, Cardinality.cacheMiss);
-//
-////                    Cardinality.resetCacheStats();
-//
-//                });
+        qg.getConcreteNodes().stream()
+                .forEach(v -> {
+                    ELT elt = qg.asELT(v);
+
+                    int card = Cardinality.cardinality(v, elt);
+
+                    System.out.printf("%-50s %-10d %-10d %-10d%n", v, card, Cardinality.cacheHit, Cardinality.cacheMiss);
+
+//                    Cardinality.resetCacheStats();
+
+                });
 
     }
 }

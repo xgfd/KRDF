@@ -6,6 +6,7 @@ import org.apache.commons.lang3.builder.MultilineRecursiveToStringStyle;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Node_URI;
 import org.apache.jena.graph.Triple;
 
@@ -116,7 +117,26 @@ class DiPredicate extends Node_URI {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        return o instanceof DiPredicate && ((DiPredicate) o).incoming == this.incoming && super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        int inMult = 31, outMult = 47;
+        return (this.incoming ? inMult : outMult) * super.hashCode();
+    }
+
+    @Override
     public String toString() {
         return (incoming ? "<-" : "->") + super.toString(RDFGraph.getPrefixMapping());
+    }
+
+    public Node asNode() {
+        return NodeFactory.createURI(this.getURI());
     }
 }
