@@ -7,7 +7,7 @@ public class PrestoTest {
     @Test
     public void main() throws Exception {
 //        String[] args = {"-m", "test/yago_data/movie.ttl", "-q", "test/yago_queries/movie/movie1-001.rq"//, "test/movie1.rq", "test/movie1.rq", "test/movie1.rq", "test/movie1.rq", "test/movie1.rq"
-        String[] args = {"-m", "test/yago_data/movie.ttl", "-f", "test/yago_queries/movie"//, "test/movie1.rq", "test/movie1.rq", "test/movie1.rq", "test/movie1.rq", "test/movie1.rq"
+        String[] args = {"-m", "test/yago_data/ac.ttl", "-f", "test/yago_queries/ac"//, "test/movie1.rq", "test/movie1.rq", "test/movie1.rq", "test/movie1.rq", "test/movie1.rq"
 //                , "-v"
 //                , "-V"
         };
