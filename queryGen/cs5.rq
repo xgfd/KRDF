@@ -1,5 +1,10 @@
-base <http://mpii.de/yago/resource/>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix yago: <http://mpii.de/yago/resource/>
+BASE    <http://mpii.de/yago/resource/>
+PREFIX  rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-select * where { ?s <diedIn> $1. ?s rdfs:label ?n. ?s <diedOnDate> ?d. ?s a $2 }
+SELECT  *
+WHERE
+  { ?s  <diedIn>              $1 ;
+        rdfs:label            ?n ;
+        <diedOnDate>          ?d ;
+        a                     $2
+  }

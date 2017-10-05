@@ -1,5 +1,10 @@
-base <http://mpii.de/yago/resource/>
-prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-prefix yago: <http://mpii.de/yago/resource/>
+BASE    <http://mpii.de/yago/resource/>
+PREFIX  rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-select ?s ?u ?c ?m where { ?s <hasOfficialLanguage> $1. ?s <hasUTCOffset> $2. ?s <hasCapital> ?c. ?s <hasCurrency> ?cur. }
+SELECT  *
+WHERE
+  { ?s  <hasOfficialLanguage> $1 ;
+        <hasUTCOffset>        $2 ;
+        <hasCapital>          ?c ;
+        <hasCurrency>         ?cur
+  }
