@@ -34,6 +34,7 @@ public class Cardinality {
         Integer cachedCard = cache.get(v, elt);
 
         if (cachedCard == null) { // no cache available
+//        if (true) { // no cache available
             miss();
             cachedCard = _cardinality(v, elt);
             cache.put(v, elt, cachedCard);
